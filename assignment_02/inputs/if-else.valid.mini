@@ -1,0 +1,15 @@
+PROGRAM Abc123
+IF ==
+   -1.5
+   - a 1
+THEN
+{
+  v = 1;
+  b = + a 1
+}
+ELSE
+{
+  v = 2;
+  b = - v 2
+}
+.
