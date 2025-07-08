@@ -5,6 +5,8 @@ import java.util.Stack;
 public class Calculator {
     private Stack<Object> stack = new Stack<>();
 
+    public static final double EPSILON = 0.00001; //TODO find appropiate range
+
     public Calculator(Stack<Object> stack) {
         this.stack = stack;
     }
@@ -48,15 +50,21 @@ public class Calculator {
             case '&':
             case '|':
             case '_':
+                nullCheck();
+                break;
             case '~':
                 negation();
                 break;
             case '?':
+                integerConversion();
+                break;
             case '!':
             case '$':
             case '@':
             case '\\':
             case '#':
+                stackSize();
+                break;
             case '\'':
             case '"':
             case '=':
@@ -153,6 +161,43 @@ public class Calculator {
         }
         stack.push(-(Integer) a);
     }
+
+    private void stackSize() {
+        stack.push(stack.size());
+    }
+
+    private void nullCheck() {
+        Object a = stack.pop();
+
+        if(a instanceof String) {
+            if(a.equals("()")) {
+                stack.push(1);
+            } else stack.push(0);
+        }
+        if(a instanceof Double) {
+            if(Math.abs((Double) a) < EPSILON) {
+                stack.push(1);
+            } else stack.push(0);
+        }
+        if(a instanceof Integer) {
+            if((Integer) a == 0) stack.push(1);
+            else stack.push(0);
+        }
+    }
+
+    private void integerConversion() {
+        Object a = stack.pop();
+
+        if(a instanceof Integer || a instanceof String) {
+            stack.push("()");
+        } else {
+
+            stack.push(((Double) a).intValue());
+        }
+
+    }
+
+
 
 
     /**
