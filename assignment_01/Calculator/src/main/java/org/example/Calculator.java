@@ -41,6 +41,8 @@ public class Calculator {
                 subtract();
                 break;
             case '*':
+                multiply();
+                break;
             case '/':
             case '%':
             case '&':
@@ -102,6 +104,37 @@ public class Calculator {
             stack.push(toDouble(a) - toDouble(b));
         }
         else stack.push((Integer)a - (Integer)b);
+    }
+
+    private void multiply() {
+        Object a = stack.pop();
+        Object b = stack.pop();
+        if(a instanceof String && b instanceof String) {
+            throw new IllegalArgumentException("Cannot multiply two Strings");
+        }
+        if(a instanceof String && b instanceof Integer) {
+            if((Integer) b < 0  || (Integer) b >= 128 ) {
+                throw new IllegalArgumentException("Multiplication with Integer requires a number between 0 and 128");
+            }
+            stack.push(((String) a) + (char) ((Integer) b).intValue());
+            return;
+        }
+        if(b instanceof String && a instanceof Integer) {
+            if((Integer) a < 0  || (Integer) a >= 128 ) {
+                throw new IllegalArgumentException("Multiplication with Integer requires a number between 0 and 128");
+            }
+            stack.push(((char) ((Integer) a).intValue() + (String) b));
+            return;
+        }
+        if(a instanceof Double || b instanceof Double) {
+            if(a instanceof String || b instanceof String) {
+                throw new IllegalArgumentException("Cannot multiply String with Double");
+
+            }
+            stack.push(toDouble(a) * toDouble(b));
+            return;
+        }
+        stack.push((Integer)a * (Integer)b);
     }
 
 

@@ -104,4 +104,69 @@ public class ArithmeticOperationTests {
 
         assertThrows(IllegalArgumentException.class, () -> calculator.executeCommand('-'));
     }
+
+    @Test
+    public void test_simpleIntegerMultiply() {
+        calculator.push(5);
+        calculator.push(3);
+
+        calculator.executeCommand('*');
+
+        assertEquals(15, calculator.pop());
+    }
+
+    @Test
+    public void test_MultiplyFloatWithInteger() {
+        calculator.push(2.5);
+        calculator.push(4);
+
+        calculator.executeCommand('*');
+
+        assertEquals(10.0, calculator.pop());
+    }
+
+    @Test
+    public void test_MultiplyStringWithInteger_AddsCharAtEnd() {
+        calculator.push(125);
+        calculator.push("test");
+
+
+        calculator.executeCommand('*');
+
+        assertEquals("test}", calculator.pop());
+    }
+
+    @Test
+    public void test_MultiplyIntegerWithString_AddsCharAtBeginning() {
+        calculator.push("test");
+        calculator.push(123);
+
+        calculator.executeCommand('*');
+
+        assertEquals("{test", calculator.pop());
+    }
+
+    @Test
+    public void test_MultiplyFloatWithString_ThrowsIllegalArgumentException() {
+        calculator.push("test");
+        calculator.push(123.2);
+
+        assertThrows(IllegalArgumentException.class, () -> calculator.executeCommand('*'));
+    }
+
+    @Test
+    public void test_MultiplyStringWithString_ThrowsIllegalArgumentException() {
+        calculator.push("test");
+        calculator.push("another test");
+
+        assertThrows(IllegalArgumentException.class, () -> calculator.executeCommand('*'));
+    }
+
+    @Test
+    public void test_MultiplyIntegerGreaterThan128WithString_ThrowsIllegalArgumentException() {
+        calculator.push(128);
+        calculator.push("test");
+
+        assertThrows(IllegalArgumentException.class, () -> calculator.executeCommand('*'));
+    }
 }
