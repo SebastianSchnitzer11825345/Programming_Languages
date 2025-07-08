@@ -48,6 +48,9 @@ public class Calculator {
             case '&':
             case '|':
             case '_':
+            case '~':
+                negation();
+                break;
             case '?':
             case '!':
             case '$':
@@ -135,6 +138,20 @@ public class Calculator {
             return;
         }
         stack.push((Integer)a * (Integer)b);
+    }
+
+    private void negation() {
+        Object a = stack.pop();
+
+        if(a instanceof String) {
+            stack.push("()");
+            return;
+        }
+        if(a instanceof Double) {
+            stack.push(-(Double) a);
+            return;
+        }
+        stack.push(-(Integer) a);
     }
 
 
