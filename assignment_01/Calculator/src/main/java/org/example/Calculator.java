@@ -1,5 +1,6 @@
 package org.example;
 import java.util.EmptyStackException;
+import java.util.Objects;
 import java.util.Stack;
 
 public class Calculator {
@@ -68,8 +69,14 @@ public class Calculator {
             case '\'':
             case '"':
             case '=':
+                comparison('=');
+                break;
             case '<':
+                comparison('<');
+                break;
             case '>':
+                comparison('>');
+                break;
             default:
                 throw new UnsupportedOperationException("Unsupported command: " + command);
         }
@@ -195,6 +202,113 @@ public class Calculator {
             stack.push(((Double) a).intValue());
         }
 
+    }
+
+    private void comparison(char command) {
+        Object a = stack.pop();
+        Object b = stack.pop();
+
+        // Case: Both are Strings
+        if(a instanceof String && b instanceof String) {
+            compareStrings((String) a, (String) b, command);
+            return;
+        }
+        // Case: Only a is a string
+        if(a instanceof String) {
+            switch(command) {
+                case '=', '<':
+                    stack.push(0);
+                    break;
+                case '>':
+                    stack.push(1);
+                    break;
+                default: throw new IllegalArgumentException("Invalid comparison command");
+            }
+            return;
+        }
+        // Case: Only b is a string
+        if(b instanceof String) {
+                switch(command) {
+                    case '=', '>':
+                        stack.push(0);
+                        break;
+                    case '<':
+                        stack.push(1);
+                        break;
+                    default: throw new IllegalArgumentException("Invalid comparison command");
+                }
+                return;
+        }
+        // Case a or b are a Float and the other an integer
+        if(a instanceof Double || b instanceof Double) {
+            Double da = toDouble(a);
+            Double db = toDouble(b);
+            switch(command) {
+                case '=':
+                    if(Math.abs(da) < 1.0 && Math.abs(db) < 1.0) {
+                        stack.push(Math.abs(da - db)<= EPSILON ? 1 : 0);
+                    }
+                    else {
+                        stack.push(Math.abs(da - db) <= Math.max(da, db) * EPSILON ? 1 : 0);
+                    }
+                    break;
+                case '<':
+                    if(Math.abs(da) < 1.0 && Math.abs(db) < 1.0) {
+                        stack.push((db-da<= EPSILON && db-da > 0)  ? 1 : 0);
+                    }
+                    else {
+                        stack.push((db-da<= EPSILON * Math.max(da,db) && db-da > 0) ? 1 : 0);
+                    }
+                    break;
+                    case '>':
+                        if(Math.abs(da) < 1.0 && Math.abs(db) < 1.0) {
+                            stack.push((da-db<= EPSILON && db-da > 0)  ? 1 : 0);
+                        }
+                        else {
+                            stack.push((da-db<= EPSILON * Math.max(da,db) && db-da > 0) ? 1 : 0);
+                        }
+                        break;
+
+                default: throw new IllegalArgumentException("Invalid comparison command");
+            }
+
+        } else {
+            Integer ia = (Integer) a;
+            Integer ib = (Integer) b;
+                switch(command) {
+                    case '=':
+                        stack.push(Objects.equals(ia, ib) ? 1 : 0);
+                        break;
+                    case '<':
+                        stack.push(ia < ib ? 1 : 0);
+                        break;
+                    case '>':
+                        stack.push(ia > ib ? 1 : 0);
+                        break;
+                    default: throw new IllegalArgumentException("Invalid comparison command");
+                }
+
+        }
+
+
+    }
+
+
+
+    private void compareStrings(String a, String b, char command) {
+        int result = a.compareTo(b);
+        switch (command) {
+            case '=':
+                stack.push(result == 0 ? 1 : 0);
+                break;
+            case '<':
+                stack.push(result < 0 ? 1 : 0);
+                break;
+            case '>':
+                stack.push(result > 0 ? 1 : 0);
+                break;
+            default: throw new IllegalArgumentException("Unsupported command: " + command);
+        }
     }
 
 
