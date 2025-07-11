@@ -8,10 +8,6 @@ public class Calculator {
 
     public static final double EPSILON = 0.00001; //TODO find appropiate range
 
-    public Calculator(Stack<Object> stack) {
-        this.stack = stack;
-    }
-
     public Calculator() {
 
     }
@@ -47,9 +43,17 @@ public class Calculator {
                 multiply();
                 break;
             case '/':
+                divide();
+                break;
             case '%':
+                modulo();
+                break;
             case '&':
+                land();
+                break;
             case '|':
+                lor();
+                break;
             case '_':
                 nullCheck();
                 break;
@@ -60,7 +64,11 @@ public class Calculator {
                 integerConversion();
                 break;
             case '!':
+                copy();
+                break;
             case '$':
+                delete();
+                break;
             case '@':
             case '\\':
             case '#':
@@ -155,6 +163,53 @@ public class Calculator {
         stack.push((Integer)a * (Integer)b);
     }
 
+    private void divide() {
+        Object a = stack.pop();
+        Object b = stack.pop();
+
+        if(a instanceof String && b instanceof String) {
+            String stra = (String)a;
+            String strb = (String)b;
+
+            stack.push(stra.indexOf(strb));
+        }
+        else {
+            Double da = toDouble(a);
+            Double db = toDouble(b);
+            if(db == 0) {
+                throw new IllegalArgumentException("Cannot divide by zero");
+            }
+            stack.push(da / db);
+        }
+    }
+
+    private void modulo() {
+        Object a = stack.pop();
+        Object b = stack.pop();
+
+        if(a instanceof Float || b instanceof Float) {
+            stack.push("()");
+        } else if(a instanceof Integer && b instanceof Integer) {
+            if((Integer) b == 0) {
+                stack.push("()");
+                return;
+            }
+            stack.push((Integer)a % (Integer)b);
+        } else if (a instanceof String && b instanceof Integer) {
+                if((Integer) b == 0 || (Integer) b >= ((String) a).length() ) {
+                    stack.push("()");
+                    return;
+                }
+                stack.push(Integer.valueOf((int)((String) a).charAt(((Integer) b))));
+
+
+        } else {
+            stack.push("()");
+        }
+
+
+    }
+
     private void negation() {
         Object a = stack.pop();
 
@@ -243,9 +298,10 @@ public class Calculator {
         if(a instanceof Double || b instanceof Double) {
             Double da = toDouble(a);
             Double db = toDouble(b);
+            boolean withinEpsilon = Math.abs(da) < 1.0 && Math.abs(db) < 1.0;
             switch(command) {
                 case '=':
-                    if(Math.abs(da) < 1.0 && Math.abs(db) < 1.0) {
+                    if(withinEpsilon) {
                         stack.push(Math.abs(da - db)<= EPSILON ? 1 : 0);
                     }
                     else {
@@ -253,7 +309,7 @@ public class Calculator {
                     }
                     break;
                 case '<':
-                    if(Math.abs(da) < 1.0 && Math.abs(db) < 1.0) {
+                    if(withinEpsilon) {
                         stack.push((db-da<= EPSILON && db-da > 0)  ? 1 : 0);
                     }
                     else {
@@ -261,7 +317,7 @@ public class Calculator {
                     }
                     break;
                     case '>':
-                        if(Math.abs(da) < 1.0 && Math.abs(db) < 1.0) {
+                        if(withinEpsilon) {
                             stack.push((da-db<= EPSILON && db-da > 0)  ? 1 : 0);
                         }
                         else {
@@ -311,6 +367,69 @@ public class Calculator {
         }
     }
 
+    private void copy() {
+        Object a = stack.pop();
+
+        if(!(a instanceof Integer)) {
+            stack.push(a);
+            return;
+        }
+        if((Integer) a >= stack.size()) {
+            stack.push(a);
+            return;
+        }
+
+        stack.push(stack.elementAt((Integer) a));
+
+    }
+    //TODO Second opinion: Should logic operators on an integer strictly work on 0 and 1 or 0 and any other value?
+    private void land() {
+        Object a = stack.pop();
+        Object b = stack.pop();
+
+        if(a instanceof Integer && b instanceof Integer) {
+            Integer ia = (Integer) a;
+            Integer ib = (Integer) b;
+
+            stack.push(ia != 0 && ib != 0 ? 1 : 0);
+        }
+        else {
+            stack.push("()");
+        }
+    }
+
+
+    private void lor() {
+        Object a = stack.pop();
+        Object b = stack.pop();
+
+        if(a instanceof Integer && b instanceof Integer) {
+            Integer ia = (Integer) a;
+            Integer ib = (Integer) b;
+
+            stack.push(ia != 0 || ib != 0 ? 1 : 0);
+        }
+        else {
+            stack.push("()");
+        }
+    }
+
+    private void delete() {
+        Object a = stack.pop();
+
+        if(!(a instanceof Integer)) {
+            stack.push(a);
+            return;
+        }
+
+        if((Integer) a >= stack.size()) {
+            stack.push(a);
+            return;
+        }
+        stack.removeElementAt((Integer) a);
+
+    }
+
 
 
 
@@ -323,5 +442,9 @@ public class Calculator {
         if (o instanceof Integer) return ((Integer) o).doubleValue();
         if (o instanceof Double) return (Double) o;
         throw new IllegalArgumentException("Received NaN in toDouble");
+    }
+
+    public int size() {
+        return stack.size();
     }
 }
