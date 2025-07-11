@@ -1,7 +1,7 @@
 package org.parser;
 //  Simplified version of Parser, better aligned with Calculator structure
 
-import org.example.Calculator;
+import org.calculator.Calculator;
 import org.registers.RegisterSet;
 
 /**
