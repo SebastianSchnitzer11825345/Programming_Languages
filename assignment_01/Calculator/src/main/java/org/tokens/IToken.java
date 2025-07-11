@@ -1,6 +1,6 @@
 package org.tokens;
 
-import org.example.Context;
+import org.calculator.Context;
 
 /**
  * A token in the calculator.

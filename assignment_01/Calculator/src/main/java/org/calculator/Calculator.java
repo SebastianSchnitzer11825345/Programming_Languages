@@ -1,4 +1,4 @@
-package org.example;
+package org.calculator;
 import java.util.EmptyStackException;
 import java.util.Objects;
 import java.util.Stack;

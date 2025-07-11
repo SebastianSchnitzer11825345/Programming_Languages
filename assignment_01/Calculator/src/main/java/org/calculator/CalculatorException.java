@@ -1,4 +1,4 @@
-package org.example;
+package org.calculator;
 
 import java.io.Serial;
 
