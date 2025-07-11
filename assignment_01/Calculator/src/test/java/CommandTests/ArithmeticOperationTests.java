@@ -1,6 +1,6 @@
 package CommandTests;
 
-import org.example.Calculator;
+import org.calculator.Calculator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -168,5 +168,91 @@ public class ArithmeticOperationTests {
         calculator.push("test");
 
         assertThrows(IllegalArgumentException.class, () -> calculator.executeCommand('*'));
+    }
+
+    @Test
+    public void test_DivideTwoIntegers_YieldsCorrectResult() {
+        calculator.push(3);
+        calculator.push(15);
+
+        calculator.executeCommand('/');
+
+        assertEquals(5.0, calculator.pop());
+    }
+
+    @Test
+    public void test_DivideFloatAndInteger_YieldsCorrectResult() {
+        calculator.push(2.5);
+        calculator.push(10);
+
+        calculator.executeCommand('/');
+        assertEquals(4.0, calculator.pop());
+    }
+
+    @Test
+    public void test_DivideByZero_ThrowsException() {
+        calculator.push(0);
+        calculator.push(1);
+
+        assertThrows(IllegalArgumentException.class, () -> calculator.executeCommand('/'));
+    }
+
+    @Test
+    public void test_DivideByString_ReturnsCorrectIndex() {
+        calculator.push("test");
+        calculator.push("another test");
+
+        calculator.executeCommand('/');
+
+        assertEquals(8, calculator.pop());
+    }
+
+    @Test
+    public void test_DivideTwoDifferentStrings_ReturnsMinus1() {
+        calculator.push("test");
+        calculator.push("no substring");
+
+        calculator.executeCommand('/');
+
+        assertEquals(-1, calculator.pop());
+    }
+
+    @Test
+    public void test_ModuloOnTwoIntegers_ReturnsModulo() {
+        calculator.push(4);
+        calculator.push(15);
+
+        calculator.executeCommand('%');
+
+        assertEquals(3, calculator.pop());
+    }
+
+    @Test
+    public void test_ModuloOnFloat_ReturnsEmptyString() {
+        calculator.push(2.0);
+        calculator.push(10);
+        calculator.executeCommand('%');
+
+        assertEquals("()", calculator.pop());
+    }
+
+    @Test
+    public void test_ModuloOnSemanticError_ReturnsEmptyString() {
+        calculator.push("test");
+        calculator.push(5);
+
+        calculator.executeCommand('%');
+
+        assertEquals("()", calculator.pop());
+    }
+
+    @Test
+    public void test_ModuloOnStringAndInteger_ReturnsCorrectAsciiCharacter() {
+        calculator.push(2);
+        calculator.push("te^t"); // ^ is 94 in Ascii
+
+        calculator.executeCommand('%');
+
+        assertEquals(94, calculator.pop());
     }
 }
