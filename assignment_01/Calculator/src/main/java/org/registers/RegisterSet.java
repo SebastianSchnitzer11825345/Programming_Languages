@@ -1,10 +1,12 @@
 package org.registers;
 
+import org.tokens.Token;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class RegisterSet {
-    private final Map<Character, RegisterValue> registers = new HashMap<>();
+    private final Map<Character, Token> registers = new HashMap<>();
 
     public RegisterSet() {
         initializeRegisters();
@@ -20,19 +22,18 @@ public class RegisterSet {
             registers.put(c, defaultValue(c));
         }
         // Set predefined content of register 'a'
-        registers.put('a', new RegisterValue("1 2 + PRINT")); // Example command stream
+        registers.put('a', new Token("1 2 + PRINT")); // Example command stream
     }
 
-    private RegisterValue defaultValue(char name) {
-        // Provide sensible defaults (could be overwritten later)
+    private Token defaultValue(char name) {
         if (Character.isLowerCase(name)) {
-            return new RegisterValue(0);  // or ""
+            return new Token(0);
         } else {
-            return new RegisterValue(0);
+            return new Token("");
         }
     }
 
-    public RegisterValue read(char name) {
+    public Token read(char name) {
         if (!registers.containsKey(name)) {
             throw new IllegalArgumentException("Invalid register name: " + name);
         }

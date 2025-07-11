@@ -18,4 +18,14 @@ public class IntegerToken implements IToken {
         ctx.getDataStack().push(this);
     }
 
+    /**
+     * Construct method used when digit already on stack and we add on top
+     * @param ctx
+     * @param digit
+     */
+    public void construct(Context ctx, int digit) {
+        this.value = this.value * 10 + digit;
+        ctx.getDataStack().push(this);
+    }
+
 }

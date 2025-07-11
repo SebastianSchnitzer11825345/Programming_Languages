@@ -1,9 +1,9 @@
-package org.registers;
+package org.tokens;
 
-public class RegisterValue {
+public class Token {
     private final Object value;
 
-    public RegisterValue(Object value) {
+    public Token(Object value) {
         if (!(value instanceof Integer || value instanceof Double || value instanceof String)) {
             throw new IllegalArgumentException("Register can only hold int, double, or string.");
         }
@@ -14,17 +14,30 @@ public class RegisterValue {
         return value;
     }
 
-    public int asInt() {
-        return (int) value;
+    public Integer asInteger() {
+        return (Integer) value;
     }
 
-    public double asDouble() {
-        return (double) value;
+    public Double asDouble() {
+        return (Double) value;
     }
 
     public String asString() {
         return (String) value;
     }
+
+    public boolean isInteger() {
+        return value instanceof Integer;
+    }
+
+    public boolean isDouble() {
+        return value instanceof Double;
+    }
+
+    public boolean isString() {
+        return value instanceof String;
+    }
+
 
     @Override
     public String toString() {

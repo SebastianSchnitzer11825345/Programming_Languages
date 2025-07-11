@@ -68,17 +68,17 @@ public class Context {
         throw new CalculatorException("Expected Integer on data stack");
     }
 
-    public FloatingPointToken nextFloat() {
+    public DecimalPointToken nextDecimal() {
         if (dataStack.size() > 0) {
             IToken token = dataStack.peek();
-            if (token instanceof FloatingPointToken)
-                return (FloatingPointToken) dataStack.pop();
+            if (token instanceof DecimalPointToken)
+                return (DecimalPointToken) dataStack.pop();
         }
 
         throw new CalculatorException("Expected Floating point number on data stack");
     }
 
-    public IntegerToken nextString() {
+    public StringToken nextString() {
         if (dataStack.size() > 0) {
             IToken token = dataStack.peek();
             if (token instanceof StringToken)
