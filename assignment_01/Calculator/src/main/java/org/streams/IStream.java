@@ -1,21 +1,22 @@
 package org.streams;
 
+import java.util.Stack;
+
 /**
  * Interface for input/output stream that a program can read from and write to.
  */
 
 public interface IStream {
     /**
-     * Reads one byte of input.
+     * Read entire line of input until Enter is pressed (preferred way)
      * Characters are returned with their ASCII encoding.
-     * @return int representing the read byte
+     * @return Object representing the read line
      */
-    public int read();
+    public Object readLine();
 
     /**
-     * Writes an integer to the stream.
-     * Often interpreted as ASCII code.
-     * @param i Integer to write to the stream.
+     * Writes an object from stack to the stream. (return StringBuilder for easier testing)
+     * @param o
      */
-    public void write(int i);
+    public StringBuilder write(Object o);
 }

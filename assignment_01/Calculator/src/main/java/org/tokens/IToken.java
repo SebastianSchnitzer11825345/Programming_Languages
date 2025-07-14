@@ -11,7 +11,7 @@ public interface IToken {
 
     public void apply(Context ctx);
 
-    public void construct(Context ctx, int digit);
+//    public void construct(Context ctx, int digit);
 
 }
 

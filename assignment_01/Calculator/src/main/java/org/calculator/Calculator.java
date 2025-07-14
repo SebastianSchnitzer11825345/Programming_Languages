@@ -1,34 +1,54 @@
 package org.calculator;
+import org.parser.ParseException;
+import org.parser.Parser;
+
 import java.util.EmptyStackException;
 import java.util.Objects;
-import java.util.Stack;
+
+//TODO: In addition to above cases, an error is reported if the data stack
+// does not have enough entries. If an error occurs, the calculator
+// simply stops its execution and gives an error message.
 
 public class Calculator {
-    private Stack<Object> stack = new Stack<>();
-
+//    private Stack<Object> stack = new Stack<>();
+    private Context ctxt = new Context();
     public static final double EPSILON = 0.00001; //TODO find appropiate range
 
     public Calculator() {
+    }
 
+    public Context getContext() {
+        return ctxt;
     }
 
     public void push(Object o) {
         if(o instanceof Integer || o instanceof Double || o instanceof String) {
-            stack.push(o);
+            ctxt.push(o);
         } else {
             throw new IllegalArgumentException("Object to push does not match expected type");
         }
     }
 
     public Object pop() {
-        if(stack.isEmpty()) {
+        if(ctxt.getDataStack().isEmpty()) {
             throw new EmptyStackException();
         }
-        return stack.pop();
+        return ctxt.pop();
     }
 
     public void reset() {
-        stack.clear();
+        ctxt.reset();
+    }
+
+    // TODO: I am not sure this is right, but after
+    public void run() throws ParseException {
+        Parser parser = new Parser(
+                this.ctxt.getCommandStream(),
+                this,
+                this.ctxt,
+                this.ctxt.getRegisters()
+        );
+        parser.parseAll();
     }
 
     public void executeCommand(char command) {
@@ -70,12 +90,15 @@ public class Calculator {
                 delete();
                 break;
             case '@':
+                applyImmediately();
             case '\\':
             case '#':
                 stackSize();
                 break;
             case '\'':
+                readInput();
             case '"':
+                StringBuilder output = writeOutput();
             case '=':
                 comparison('=');
                 break;
@@ -92,27 +115,27 @@ public class Calculator {
 
 
     private void add() {
-        Object a = stack.pop();
-        Object b = stack.pop();
+        Object a = ctxt.pop();
+        Object b = ctxt.pop();
 
         if(a instanceof String || b instanceof String) {
-            stack.push(String.valueOf(a) + b);
+            ctxt.push(String.valueOf(a) + b);
         }
         else if(a instanceof Double || b instanceof Double) {
-            stack.push(toDouble(a) + toDouble(b));
+            ctxt.push(toDouble(a) + toDouble(b));
         }
-        else stack.push((Integer)a + (Integer) b);
+        else ctxt.push((Integer)a + (Integer) b);
     }
 
     private void subtract() {
-        Object a = stack.pop();
-        Object b = stack.pop();
+        Object a = ctxt.pop();
+        Object b = ctxt.pop();
 
         if(a instanceof String && b instanceof Integer) {
             if((Integer) b < 0 ) {
                 throw new IllegalArgumentException("Subtraction requires a positive number");
             }
-            stack.push(((String) a).substring((Integer) b ));
+            ctxt.push(((String) a).substring((Integer) b ));
 
             return;
         }
@@ -120,21 +143,21 @@ public class Calculator {
             if((Integer) a < 0 ) {
                 throw new IllegalArgumentException("Subtraction requires a positive number");
             }
-            stack.push(((String) b).substring(0, ((String) b).length()-((Integer) a)));
+            ctxt.push(((String) b).substring(0, ((String) b).length()-((Integer) a)));
             return;
         }
 
         if(a instanceof Double || b instanceof Double) {
             if(a instanceof String || b instanceof String) throw new IllegalArgumentException("Cannot subtract String and Double");
 
-            stack.push(toDouble(a) - toDouble(b));
+            ctxt.push(toDouble(a) - toDouble(b));
         }
-        else stack.push((Integer)a - (Integer)b);
+        else ctxt.push((Integer)a - (Integer)b);
     }
 
     private void multiply() {
-        Object a = stack.pop();
-        Object b = stack.pop();
+        Object a = ctxt.pop();
+        Object b = ctxt.pop();
         if(a instanceof String && b instanceof String) {
             throw new IllegalArgumentException("Cannot multiply two Strings");
         }
@@ -142,14 +165,14 @@ public class Calculator {
             if((Integer) b < 0  || (Integer) b >= 128 ) {
                 throw new IllegalArgumentException("Multiplication with Integer requires a number between 0 and 128");
             }
-            stack.push(((String) a) + (char) ((Integer) b).intValue());
+            ctxt.push(((String) a) + (char) ((Integer) b).intValue());
             return;
         }
         if(b instanceof String && a instanceof Integer) {
             if((Integer) a < 0  || (Integer) a >= 128 ) {
                 throw new IllegalArgumentException("Multiplication with Integer requires a number between 0 and 128");
             }
-            stack.push(((char) ((Integer) a).intValue() + (String) b));
+            ctxt.push(((char) ((Integer) a).intValue() + (String) b));
             return;
         }
         if(a instanceof Double || b instanceof Double) {
@@ -157,21 +180,21 @@ public class Calculator {
                 throw new IllegalArgumentException("Cannot multiply String with Double");
 
             }
-            stack.push(toDouble(a) * toDouble(b));
+            ctxt.push(toDouble(a) * toDouble(b));
             return;
         }
-        stack.push((Integer)a * (Integer)b);
+        ctxt.push((Integer)a * (Integer)b);
     }
 
     private void divide() {
-        Object a = stack.pop();
-        Object b = stack.pop();
+        Object a = ctxt.pop();
+        Object b = ctxt.pop();
 
         if(a instanceof String && b instanceof String) {
             String stra = (String)a;
             String strb = (String)b;
 
-            stack.push(stra.indexOf(strb));
+            ctxt.push(stra.indexOf(strb));
         }
         else {
             Double da = toDouble(a);
@@ -179,89 +202,89 @@ public class Calculator {
             if(db == 0) {
                 throw new IllegalArgumentException("Cannot divide by zero");
             }
-            stack.push(da / db);
+            ctxt.push(da / db);
         }
     }
 
     private void modulo() {
-        Object a = stack.pop();
-        Object b = stack.pop();
+        Object a = ctxt.pop();
+        Object b = ctxt.pop();
 
         if(a instanceof Float || b instanceof Float) {
-            stack.push("()");
+            ctxt.push("()");
         } else if(a instanceof Integer && b instanceof Integer) {
             if((Integer) b == 0) {
-                stack.push("()");
+                ctxt.push("()");
                 return;
             }
-            stack.push((Integer)a % (Integer)b);
+            ctxt.push((Integer)a % (Integer)b);
         } else if (a instanceof String && b instanceof Integer) {
                 if((Integer) b == 0 || (Integer) b >= ((String) a).length() ) {
-                    stack.push("()");
+                    ctxt.push("()");
                     return;
                 }
-                stack.push(Integer.valueOf((int)((String) a).charAt(((Integer) b))));
+                ctxt.push(Integer.valueOf((int)((String) a).charAt(((Integer) b))));
 
 
         } else {
-            stack.push("()");
+            ctxt.push("()");
         }
 
 
     }
 
     private void negation() {
-        Object a = stack.pop();
+        Object a = ctxt.pop();
 
         if(a instanceof String) {
-            stack.push("()");
+            ctxt.push("()");
             return;
         }
         if(a instanceof Double) {
-            stack.push(-(Double) a);
+            ctxt.push(-(Double) a);
             return;
         }
-        stack.push(-(Integer) a);
+        ctxt.push(-(Integer) a);
     }
 
     private void stackSize() {
-        stack.push(stack.size());
+        ctxt.push(ctxt.getStackSize());
     }
 
     private void nullCheck() {
-        Object a = stack.pop();
+        Object a = ctxt.pop();
 
         if(a instanceof String) {
             if(a.equals("()")) {
-                stack.push(1);
-            } else stack.push(0);
+                ctxt.push(1);
+            } else ctxt.push(0);
         }
         if(a instanceof Double) {
             if(Math.abs((Double) a) < EPSILON) {
-                stack.push(1);
-            } else stack.push(0);
+                ctxt.push(1);
+            } else ctxt.push(0);
         }
         if(a instanceof Integer) {
-            if((Integer) a == 0) stack.push(1);
-            else stack.push(0);
+            if((Integer) a == 0) ctxt.push(1);
+            else ctxt.push(0);
         }
     }
 
     private void integerConversion() {
-        Object a = stack.pop();
+        Object a = ctxt.pop();
 
         if(a instanceof Integer || a instanceof String) {
-            stack.push("()");
+            ctxt.push("()");
         } else {
 
-            stack.push(((Double) a).intValue());
+            ctxt.push(((Double) a).intValue());
         }
 
     }
 
     private void comparison(char command) {
-        Object a = stack.pop();
-        Object b = stack.pop();
+        Object a = ctxt.pop();
+        Object b = ctxt.pop();
 
         // Case: Both are Strings
         if(a instanceof String && b instanceof String) {
@@ -272,10 +295,10 @@ public class Calculator {
         if(a instanceof String) {
             switch(command) {
                 case '=', '<':
-                    stack.push(0);
+                    ctxt.push(0);
                     break;
                 case '>':
-                    stack.push(1);
+                    ctxt.push(1);
                     break;
                 default: throw new IllegalArgumentException("Invalid comparison command");
             }
@@ -285,10 +308,10 @@ public class Calculator {
         if(b instanceof String) {
                 switch(command) {
                     case '=', '>':
-                        stack.push(0);
+                        ctxt.push(0);
                         break;
                     case '<':
-                        stack.push(1);
+                        ctxt.push(1);
                         break;
                     default: throw new IllegalArgumentException("Invalid comparison command");
                 }
@@ -302,26 +325,26 @@ public class Calculator {
             switch(command) {
                 case '=':
                     if(withinEpsilon) {
-                        stack.push(Math.abs(da - db)<= EPSILON ? 1 : 0);
+                        ctxt.push(Math.abs(da - db)<= EPSILON ? 1 : 0);
                     }
                     else {
-                        stack.push(Math.abs(da - db) <= Math.max(da, db) * EPSILON ? 1 : 0);
+                        ctxt.push(Math.abs(da - db) <= Math.max(da, db) * EPSILON ? 1 : 0);
                     }
                     break;
                 case '<':
                     if(withinEpsilon) {
-                        stack.push((db-da<= EPSILON && db-da > 0)  ? 1 : 0);
+                        ctxt.push((db-da<= EPSILON && db-da > 0)  ? 1 : 0);
                     }
                     else {
-                        stack.push((db-da<= EPSILON * Math.max(da,db) && db-da > 0) ? 1 : 0);
+                        ctxt.push((db-da<= EPSILON * Math.max(da,db) && db-da > 0) ? 1 : 0);
                     }
                     break;
                     case '>':
                         if(withinEpsilon) {
-                            stack.push((da-db<= EPSILON && db-da > 0)  ? 1 : 0);
+                            ctxt.push((da-db<= EPSILON && db-da > 0)  ? 1 : 0);
                         }
                         else {
-                            stack.push((da-db<= EPSILON * Math.max(da,db) && db-da > 0) ? 1 : 0);
+                            ctxt.push((da-db<= EPSILON * Math.max(da,db) && db-da > 0) ? 1 : 0);
                         }
                         break;
 
@@ -333,13 +356,13 @@ public class Calculator {
             Integer ib = (Integer) b;
                 switch(command) {
                     case '=':
-                        stack.push(Objects.equals(ia, ib) ? 1 : 0);
+                        ctxt.push(Objects.equals(ia, ib) ? 1 : 0);
                         break;
                     case '<':
-                        stack.push(ia < ib ? 1 : 0);
+                        ctxt.push(ia < ib ? 1 : 0);
                         break;
                     case '>':
-                        stack.push(ia > ib ? 1 : 0);
+                        ctxt.push(ia > ib ? 1 : 0);
                         break;
                     default: throw new IllegalArgumentException("Invalid comparison command");
                 }
@@ -355,82 +378,88 @@ public class Calculator {
         int result = a.compareTo(b);
         switch (command) {
             case '=':
-                stack.push(result == 0 ? 1 : 0);
+                ctxt.push(result == 0 ? 1 : 0);
                 break;
             case '<':
-                stack.push(result < 0 ? 1 : 0);
+                ctxt.push(result < 0 ? 1 : 0);
                 break;
             case '>':
-                stack.push(result > 0 ? 1 : 0);
+                ctxt.push(result > 0 ? 1 : 0);
                 break;
             default: throw new IllegalArgumentException("Unsupported command: " + command);
         }
     }
 
     private void copy() {
-        Object a = stack.pop();
+        Object a = ctxt.pop();
 
         if(!(a instanceof Integer)) {
-            stack.push(a);
+            ctxt.push(a);
             return;
         }
-        if((Integer) a >= stack.size()) {
-            stack.push(a);
+        // TODO: added + 1 as we pop element before, and no equal (for 3 elements in stack,
+        if((Integer) a >= ctxt.getStackSize() + 1 ) {
+            ctxt.push(a);
             return;
         }
 
-        stack.push(stack.elementAt((Integer) a));
+        // TODO: nth entry on the data stack (counted from the top of stack) so the other way around
+        ctxt.push(ctxt.getElementAt((Integer) a));
 
     }
     //TODO Second opinion: Should logic operators on an integer strictly work on 0 and 1 or 0 and any other value?
+    // can compare all integers based on: 0 = false, each other integer value = true
     private void land() {
-        Object a = stack.pop();
-        Object b = stack.pop();
+        Object a = ctxt.pop();
+        Object b = ctxt.pop();
 
         if(a instanceof Integer && b instanceof Integer) {
-            Integer ia = (Integer) a;
-            Integer ib = (Integer) b;
+            Integer ia = (Integer) a > 0 ? 1 : 0; // changed the logic as defined above
+            Integer ib = (Integer) b > 0 ? 1 : 0; // changed the logic as defined above
 
-            stack.push(ia != 0 && ib != 0 ? 1 : 0);
+            ctxt.push(ia != 0 && ib != 0 ? 1 : 0);
         }
         else {
-            stack.push("()");
+            ctxt.push("()");
         }
     }
 
 
     private void lor() {
-        Object a = stack.pop();
-        Object b = stack.pop();
+        Object a = ctxt.pop();
+        Object b = ctxt.pop();
 
         if(a instanceof Integer && b instanceof Integer) {
-            Integer ia = (Integer) a;
-            Integer ib = (Integer) b;
+            Integer ia = (Integer) a > 0 ? 1 : 0; // changed the logic as defined above
+            Integer ib = (Integer) b > 0 ? 1 : 0; // changed the logic as defined above
 
-            stack.push(ia != 0 || ib != 0 ? 1 : 0);
+            ctxt.push(ia != 0 || ib != 0 ? 1 : 0);
         }
         else {
-            stack.push("()");
+            ctxt.push("()");
         }
     }
 
+    // TODO: it should remove counting from top not bottom of stack
+    //      (so remove Element at as in Ctxt doesn't work right)
     private void delete() {
-        Object a = stack.pop();
+        Object a = ctxt.pop();
 
+        // TODO: I think in this case just pop, no need to push a back to stack
         if(!(a instanceof Integer)) {
-            stack.push(a);
+            ctxt.push(a);
             return;
         }
 
-        if((Integer) a >= stack.size()) {
-            stack.push(a);
+        // TODO: I think in this case just pop, no need to push a back to stack,
+        //       but if a=stackSize, still remove
+        if((Integer) a >= ctxt.getStackSize()) {
+            ctxt.push(a);
             return;
         }
-        stack.removeElementAt((Integer) a);
+        ctxt.removeElementAt((Integer) a);
 
     }
-
-
 
 
     /**
@@ -445,6 +474,21 @@ public class Calculator {
     }
 
     public int size() {
-        return stack.size();
+        return ctxt.getStackSize();
+    }
+
+    public void applyImmediately() {
+        ctxt.addToCommandStreamInFront(ctxt.pop());
+    }
+
+    public void readInput() {
+        Object input = ctxt.readInput();
+        ctxt.addToCommandStreamInFront(input);
+    }
+
+    public StringBuilder writeOutput() {
+        Object element = ctxt.pop();
+        StringBuilder output = ctxt.writeOutput(element);
+        return output;
     }
 }

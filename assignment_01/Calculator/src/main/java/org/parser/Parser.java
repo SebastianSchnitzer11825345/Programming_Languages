@@ -1,235 +1,183 @@
 package org.parser;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import org.calculator.Calculator;
 import org.calculator.Context;
 import org.registers.RegisterSet;
-import org.tokens.*;
 
 /**
- * Class to help with parsing the language of the calculator.
+ *  Class to help with parsing the language of the calculator.
  */
 public class Parser {
-    private String input;
+    private final String commandStream;
     private int m = 0; // operation mode
+    private Calculator calculator;
+    private Context ctxt;
+    private final RegisterSet registers;
 
-    // TODO: fix the method to our needs
+    public Parser(String commandStream, Calculator calculator, Context context, RegisterSet registers) {
+        this.commandStream = commandStream;
+        this.calculator = calculator;
+        this.ctxt = context;
+        this.registers = registers;
+    }
+
     /**
-     * This is main method to parse tokens
-     * @param input
-     * @return
+     *
+     * Parse all elements in input (Command stack)
      * @throws ParseException
      */
-    public Context parse(String input) throws ParseException {
-        Context context = new Context();
-
-        if (mismatchedBrackets()) {
-            throw new MismatchedBracketsException();
-        }
-
-        if (input.isEmpty()) {
+    public void parseAll() throws ParseException {
+        if (this.commandStream.isEmpty()) {
             throw new ParseException("Empty input");
         }
-        int pos = 0;
-        char currChar = input.charAt(pos);
+        for (int pos = 0; pos < this.commandStream.length(); pos++) {
+            char currChar = this.commandStream.charAt(pos);
+            parseElement(currChar);
+//            this.commandStream = this.commandStream.substring(1, pos);
+        }
+    }
 
+    /**
+     * Parse individual elements (each character)
+     * @throws ParseException
+     */
+    private void parseElement(char currChar) throws ParseException {
         // start with executable operation mode
-        if (m == 0) {
+        if (this.m == 0) {
             // case digits
             if (Character.isDigit(currChar)) {
-                IntegerToken currToken = new IntegerToken((int) currChar);
-                currToken.apply(context);
-                m = -1;
+                this.ctxt.push(Character.getNumericValue(currChar)); // convert to integer and push on stack
+                this.m = -1; // enter Integer Construction mode
             }
 
             // case dot
             else if (currChar == '.') {
-                DecimalPointToken currToken = new DecimalPointToken(0.0);
-                currToken.apply(context); // push 0.0 back on top of stack as decimal point
-                m = -2; // enter Decimal Point Construction mode
+                initializeDecimal();
             }
 
             // case String with "("
             else if (currChar == '(') {
-                StringToken currToken = new StringToken("");
-                currToken.apply(context); // push empty string to the top of stack as decimal point
-                m = 1; // enter String Construction mode
+                initializeString();
             }
 
-            // case Letter (call register)
+            // case Letter (call register and push its contents to stack)
             else if (Character.isLetter(currChar)) {
-                IToken currRegister = context.getRegisters().read(currChar);
-
+                ctxt.push(registers.read(currChar));
             }
 
-            // case operators - move to Calculator
-            else if (currChar is Command){
+            // case operators - pass supported symbols to Calculator
+            else if ("=<>+-*/%&|_~?!$@\\#'".indexOf(currChar) >= 0) {
+                calculator.executeCommand(currChar);
             }
         }
 
-                // Integer Construction Mode
-        if (m == -1) {
+        // Integer Construction Mode
+        else if (this.m == -1) {
             // case continue with digits
             if (Character.isDigit(currChar)) {
-                int digit = Character.getNumericValue(currChar);
-                IToken lastToken = context.getDataStack().pop();
-                if (!(lastToken instanceof IntegerToken)) {
-                    throw new RuntimeException("Expected IntegerToken on top of stack");
-                }
-                ((IntegerToken) lastToken).construct(context, digit); // update value on top of stack
-
-            // case entering Decimal Point Construction Mode
+                addToInteger(currChar);
             } else if (currChar == '.') {
-                IToken currToken = context.getDataStack().pop();
-                ((DecimalPointToken) currToken).apply(context); // convert and push back on top of stack as decimal point
-                m = -2; // enter Decimal Point Construction mode
-            }
-            else {
-                m = 0;
+                convertToDecimal();
+            } else {
+                this.m = 0;
             }
         }
 
         // Decimal Place Construction Mode
-        if (m < -1) {
+        else if (this.m < -1) {
             if (Character.isDigit(currChar)) {
-                int digit = Character.getNumericValue(currChar);
-                IToken lastToken = context.getDataStack().pop();
-                if (!(lastToken instanceof DecimalPointToken)) {
-                    throw new RuntimeException("Expected Decimal Point on top of stack");
-                }
-                ((DecimalPointToken) lastToken).construct(context, digit, m); // update value on top of stack
-                m -= 1; // stay in Decimal Place Construction mode
+                addToDecimal(currChar); // update value on top of stack
+                this.m -= 1;
             } else if (currChar == '.') {
-                DecimalPointToken currToken = new DecimalPointToken(0.0);
-                currToken.apply(context); // push 0.0 on top of stack as decimal point
-                m = -2; // enter Decimal Point Construction mode
+                initializeDecimal();
             } else {
-                m = 0; // back to execution mode
+                this.m = 0; // back to execution mode
             }
         }
 
         // String Construction Mode
-        if (m > 0) {
-
-
-
-
-        }
-        return context;
-    }
-
-    private List<IToken> parseTokens(String input) throws ParseException {
-        this.input = input;
-        List<IToken> tokens = new ArrayList<>();
-        IToken token;
-
-        while ((token = nextToken()) != null) {
-            tokens.add(token);
-        }
-
-        return tokens;
-    }
-
-    private IToken nextToken() throws ParseException {
-        // remove whitespace
-        input = input.trim();
-
-        if (input.isEmpty())
-            return null;
-
-        char ch = input.charAt(0);
-        if (Character.isDigit(ch)) {
-            return nextInt();
-        } else if (ch == '(') {
-            return nextBlock();
-        } else {
-            return nextOperator();
-        }
-    }
-
-    private IntegerToken nextInt() {
-        int val = 0;
-        while (!input.isEmpty() && Character.isDigit(input.charAt(0))) {
-            val *= 10;
-            val += Character.getNumericValue(input.charAt(0));
-            input = input.substring(1);
-        }
-
-        return new IntegerToken(val);
-    }
-
-
-    private StringToken nextString()  {
-
-        // parse block content
-        String inner = input.substring(1, i);
-
-        StringToken statement = new StringToken();
-
-        Parser p = new Parser();
-        block.getTokens().addAll(p.parseTokens(inner));
-
-        input = input.substring(i+1);
-        return block;
-    }
-
-    // TODO: check which operators needed here and implement
-    private IToken nextOperator() throws ParseException {
-        char ch = input.charAt(0);
-        input = input.substring(1);
-        IToken operator = OperatorFactory.getOperator(ch);
-
-        if (operator == null) {
-            throw new ParseException("Unknown operator: " + ch);
-        }
-
-        return operator;
-    }
-
-    // TODO: already adjusted
-    private BlockElement nextBlock() throws ParseException {
-        // find matching bracket
-        int openBrackets = 1;
-        int i;
-        for (i = 1; i < input.length(); i++) {
-            if (input.charAt(i) == '(') {
-                openBrackets++;
-            } else if (input.charAt(i) == ')') {
-                openBrackets--;
+        else { // for this.m > 0
+            // case String with "("
+            if (currChar == ')') {
+                this.m -= 1; // first decrement m
+                if (this.m != 0) { // only add if m is not 0
+                    addToString(currChar);
+                }
             }
-            if (openBrackets == 0) break;
+            else if (currChar == '(') {
+                addToString(currChar);
+                this.m += 1;
+            }
+            else {
+                addToString(currChar); // no change to m
+            }
         }
-
-        // parse block content
-        String inner = input.substring(1, i);
-        BlockElement block = new BlockElement();
-
-        Parser p = new Parser();
-        block.getTokens().addAll(p.parseTokens(inner));
-
-        input = input.substring(i+1);
-        return block;
     }
 
     /**
-     * Check for mismatched brackets
-     * @return <tt>true</tt> if there are mismatched brackets,
-     *         <tt>false</tt> otherwise
+     * Build integers in Integer Construction Mode
+     * @param currChar
      */
-    private boolean mismatchedBrackets() {
-        int openBrackets = 0;
-        for (int i = 0; i < input.length(); i++) {
-            if (input.charAt(i) == '[') {
-                openBrackets++;
-            } else if (input.charAt(i) == ']') {
-                openBrackets--;
-            }
-            if (openBrackets < 0) return true;
+    private void addToInteger(char currChar) {
+        Object lastToken = this.ctxt.pop();
+        if (!(lastToken instanceof Integer)) {
+            throw new RuntimeException("Expected IntegerToken on top of stack");
         }
-
-        return openBrackets > 0;
+        Integer value = ((Integer) lastToken) * 10 + Character.getNumericValue(currChar);;
+        this.ctxt.push(value); // push new Integer value on stack
     }
 
+    /**
+     * Initialize Decimal point as Double, from either Execution mode or
+     * one of Integer or Decimal Point Construction mode
+     */
+    private void initializeDecimal() {
+        ctxt.push(0.0); // push 0.0 on top of stack as decimal point
+        this.m = -2; // enter Decimal Point Construction mode
+    }
+
+    /**
+     * Enter Decimal Point Construction mode from Integer Construction mode
+     */
+    private void convertToDecimal() {
+        Object currToken = ctxt.pop();
+        ctxt.push((Double) currToken); // convert and push back on top of stack as decimal point
+        this.m = -2; // enter Decimal Point Construction mode
+    }
+
+    /**
+     * Build Decimal Points in Decimal Points Construction Mode
+     * @param currChar
+     */
+    private void addToDecimal(char currChar) {
+        Object lastToken = this.ctxt.pop();
+        if (!(lastToken instanceof Double)) {
+            throw new RuntimeException("Expected Decimal Point on top of stack");
+        }
+        Double value = (Double) lastToken + Character.getNumericValue(currChar) * Math.pow(10, this.m + 1);
+        ctxt.push(value); // push new Double value (Decimal Point) on stack
+        this.m -= 1; // stay in Decimal Place Construction mode, move decimal place
+    }
+
+    /**
+     * Initialize String on stack with "", from either Execution mode or
+     * String Construction mode
+     */
+    private void initializeString() {
+        ctxt.push(""); // push empty string to the top of stack as decimal point
+        m = 1; // enter String Construction mode
+    }
+
+    /**
+     * Build String in String Construction Mode
+     * @param currChar
+     */
+    private void addToString(char currChar) {
+        Object lastToken = this.ctxt.pop();
+        if (!(lastToken instanceof String)) {
+            throw new RuntimeException("Expected String on top of stack");
+        }
+        String updated = (String) lastToken + currChar;
+        ctxt.push(updated); // push new String statement on stack
+    }
 }
