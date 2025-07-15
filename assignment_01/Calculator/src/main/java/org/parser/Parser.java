@@ -14,11 +14,11 @@ public class Parser {
     private Context ctxt;
     private final RegisterSet registers;
 
-    public Parser(String commandStream, Calculator calculator, Context context, RegisterSet registers) {
+    public Parser(String commandStream, Calculator calculator) {
         this.commandStream = commandStream;
         this.calculator = calculator;
-        this.ctxt = context;
-        this.registers = registers;
+        this.ctxt = calculator.getContext();
+        this.registers = calculator.getContext().getRegisters();
     }
 
     /**
@@ -33,7 +33,6 @@ public class Parser {
         for (int pos = 0; pos < this.commandStream.length(); pos++) {
             char currChar = this.commandStream.charAt(pos);
             parseElement(currChar);
-//            this.commandStream = this.commandStream.substring(1, pos);
         }
     }
 
@@ -42,77 +41,99 @@ public class Parser {
      * @throws ParseException
      */
     private void parseElement(char currChar) throws ParseException {
+
         // start with executable operation mode
         if (this.m == 0) {
-            // case digits
-            if (Character.isDigit(currChar)) {
-                this.ctxt.push(Character.getNumericValue(currChar)); // convert to integer and push on stack
-                this.m = -1; // enter Integer Construction mode
-            }
-
-            // case dot
-            else if (currChar == '.') {
-                initializeDecimal();
-            }
-
-            // case String with "("
-            else if (currChar == '(') {
-                initializeString();
-            }
-
-            // case Letter (call register and push its contents to stack)
-            else if (Character.isLetter(currChar)) {
-                ctxt.push(registers.read(currChar));
-            }
-
-            // case operators - pass supported symbols to Calculator
-            else if ("=<>+-*/%&|_~?!$@\\#'".indexOf(currChar) >= 0) {
-                calculator.executeCommand(currChar);
-            }
+            runExecutionMode(currChar);
         }
 
         // Integer Construction Mode
         else if (this.m == -1) {
-            // case continue with digits
-            if (Character.isDigit(currChar)) {
-                addToInteger(currChar);
-            } else if (currChar == '.') {
-                convertToDecimal();
-            } else {
-                this.m = 0;
-            }
+            runIntegerConstructionMode(currChar);
         }
 
         // Decimal Place Construction Mode
         else if (this.m < -1) {
-            if (Character.isDigit(currChar)) {
-                addToDecimal(currChar); // update value on top of stack
-                this.m -= 1;
-            } else if (currChar == '.') {
-                initializeDecimal();
-            } else {
-                this.m = 0; // back to execution mode
-            }
+            runDecimalPointConstructionMode(currChar);
         }
 
         // String Construction Mode
         else { // for this.m > 0
-            // case String with "("
-            if (currChar == ')') {
-                this.m -= 1; // first decrement m
-                if (this.m != 0) { // only add if m is not 0
-                    addToString(currChar);
-                }
-            }
-            else if (currChar == '(') {
-                addToString(currChar);
-                this.m += 1;
-            }
-            else {
-                addToString(currChar); // no change to m
-            }
+            runStringConstructionMode(currChar);
         }
     }
+
+
+    private void runExecutionMode(char currChar) {
+        // case digits
+        if (Character.isDigit(currChar)) {
+            this.ctxt.push(Character.getNumericValue(currChar)); // convert to integer and push on stack
+            this.m = -1; // enter Integer Construction mode
+        }
+
+        // case dot
+        else if (currChar == '.') {
+            initializeDecimal();
+        }
+
+        // case String with "("
+        else if (currChar == '(') {
+            initializeString();
+        }
+
+        // case Letter (call register and push its contents to stack)
+        else if (Character.isLetter(currChar)) {
+            this.ctxt.push(this.registers.read(currChar));
+        }
+
+        // case operators - pass supported symbols to Calculator
+        else if ("=<>+-*/%&|_~?!$@\\#'".indexOf(currChar) >= 0) {
+            this.calculator.executeCommand(currChar);
+        }
+    }
+
+    private void runIntegerConstructionMode (char currChar) {
+        // case continue with digits
+        if (Character.isDigit(currChar)) {
+            addToInteger(currChar);
+        } else if (currChar == '.') {
+            convertToDecimal();
+        } else {
+            this.m = 0;
+            runExecutionMode(currChar);
+        }
+    }
+
+    public void runDecimalPointConstructionMode(char currChar) {
+        if (Character.isDigit(currChar)) {
+            addToDecimal(currChar); // update value on top of stack
+            this.m -= 1;
+        } else if (currChar == '.') {
+            initializeDecimal();
+        } else {
+            this.m = 0; // back to execution mode
+            runExecutionMode(currChar);
+        }
+    }
+
+    public void runStringConstructionMode(char currChar) {
+        // for this.m > 0
+        // case String with "("
+        if (currChar == ')') {
+            this.m -= 1; // first decrement m
+            if (this.m != 0) { // only add if m is not 0
+                addToString(currChar);
+            }
+        }
+        else if (currChar == '(') {
+            addToString(currChar);
+            this.m += 1;
+        }
+        else {
+            addToString(currChar); // no change to m
+        }
+    }
+
 
     /**
      * Build integers in Integer Construction Mode
@@ -121,7 +142,7 @@ public class Parser {
     private void addToInteger(char currChar) {
         Object lastToken = this.ctxt.pop();
         if (!(lastToken instanceof Integer)) {
-            throw new RuntimeException("Expected IntegerToken on top of stack");
+            throw new RuntimeException("Expected Integer on top of stack");
         }
         Integer value = ((Integer) lastToken) * 10 + Character.getNumericValue(currChar);;
         this.ctxt.push(value); // push new Integer value on stack
@@ -141,7 +162,7 @@ public class Parser {
      */
     private void convertToDecimal() {
         Object currToken = ctxt.pop();
-        ctxt.push((Double) currToken); // convert and push back on top of stack as decimal point
+        ctxt.push(((Number) currToken).doubleValue()); // convert and push back on top of stack as decimal point
         this.m = -2; // enter Decimal Point Construction mode
     }
 
@@ -154,7 +175,7 @@ public class Parser {
         if (!(lastToken instanceof Double)) {
             throw new RuntimeException("Expected Decimal Point on top of stack");
         }
-        Double value = (Double) lastToken + Character.getNumericValue(currChar) * Math.pow(10, this.m + 1);
+        Double value = (double) lastToken + Character.getNumericValue(currChar) * Math.pow(10, this.m + 1);
         ctxt.push(value); // push new Double value (Decimal Point) on stack
         this.m -= 1; // stay in Decimal Place Construction mode, move decimal place
     }

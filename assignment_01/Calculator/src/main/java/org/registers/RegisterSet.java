@@ -1,7 +1,5 @@
 package org.registers;
 
-import org.tokens.Token;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +24,7 @@ public class RegisterSet {
         registers.put('a',reg_a_contents());
     }
 
-    private StringBuilder reg_a_contents() {
+    private String reg_a_contents() {
         StringBuilder contents = new StringBuilder();
         contents.append("(Welcome to calculator)");
         contents.append('"');
@@ -37,7 +35,7 @@ public class RegisterSet {
 
         // OUTput STACK
         // LOOP
-        return contents;
+        return contents.toString();
     }
 
     private Object defaultValue(char name) {

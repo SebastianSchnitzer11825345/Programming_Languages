@@ -11,10 +11,11 @@ import java.util.Objects;
 
 public class Calculator {
 //    private Stack<Object> stack = new Stack<>();
-    private Context ctxt = new Context();
+    private Context ctxt;
     public static final double EPSILON = 0.00001; //TODO find appropiate range
 
-    public Calculator() {
+    public Calculator(Context ctx) {
+        this.ctxt = ctx;
     }
 
     public Context getContext() {
@@ -38,17 +39,6 @@ public class Calculator {
 
     public void reset() {
         ctxt.reset();
-    }
-
-    // TODO: I am not sure this is right, but after
-    public void run() throws ParseException {
-        Parser parser = new Parser(
-                this.ctxt.getCommandStream(),
-                this,
-                this.ctxt,
-                this.ctxt.getRegisters()
-        );
-        parser.parseAll();
     }
 
     public void executeCommand(char command) {
@@ -91,14 +81,17 @@ public class Calculator {
                 break;
             case '@':
                 applyImmediately();
+                break;
             case '\\':
             case '#':
                 stackSize();
                 break;
             case '\'':
                 readInput();
+                break;
             case '"':
-                StringBuilder output = writeOutput();
+                writeOutput();
+                break;
             case '=':
                 comparison('=');
                 break;
@@ -486,9 +479,7 @@ public class Calculator {
         ctxt.addToCommandStreamInFront(input);
     }
 
-    public StringBuilder writeOutput() {
-        Object element = ctxt.pop();
-        StringBuilder output = ctxt.writeOutput(element);
-        return output;
+    public String writeOutput() {
+        return ctxt.writeOutput(ctxt.pop());
     }
 }

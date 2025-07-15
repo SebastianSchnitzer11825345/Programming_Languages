@@ -68,7 +68,7 @@ public class InStream implements IStream {
     }
 
     @Override
-    public StringBuilder write(Object o) {
+    public String write(Object o, Boolean testMode) {
         throw new UnsupportedOperationException("Cannot write to input stream");
     }
 

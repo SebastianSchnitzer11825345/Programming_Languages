@@ -16,7 +16,7 @@ public interface IStream {
 
     /**
      * Writes an object from stack to the stream. (return StringBuilder for easier testing)
-     * @param o
+     * @param o, testMode
      */
-    public StringBuilder write(Object o);
+    public String write(Object o, Boolean testMode);
 }

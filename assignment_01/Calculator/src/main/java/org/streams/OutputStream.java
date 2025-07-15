@@ -26,30 +26,39 @@ public class OutputStream implements IStream {
     // and special characters in the string (for each category counted separately).
 
     /**
-     * Store data stack objects in buffer
+     * Print out data stack object (run mode) or
+     * store data stack object in buffer (for Test mode)
      * @param o Object to write to the stream.
      */
     @Override
-    public StringBuilder write(Object o) {
+    public String write(Object o, Boolean testMode ) {
+        if (testMode) {
+            return writeOutputToBuffer(o);  // test mode: return StringBuilder
+        } else {
+            writeOutputToScreen(o);         // run mode: print to screen
+            return null;
+        }
+
+    }
+
+    public String writeOutputToBuffer(Object o) {
         buffer.setLength(0);
 
-        if (o instanceof Integer) {
+        if (o instanceof Integer || o instanceof String) {
             buffer.append(o);
-        }
-        else if (o instanceof Double) {
+        } else if (o instanceof Double) {
             double d = (Double) o;
             if (d == (long) d) {
-                // It's a whole number, print without decimal
                 buffer.append((long) d);
             } else {
-                // Keep meaningful decimal digits only
                 buffer.append(d);
             }
         }
-        else {
-            buffer.append(o.toString());
-        }
-        return buffer;
+        return buffer.toString();
+    }
+
+    public void writeOutputToScreen(Object element) {
+        System.out.println(writeOutputToBuffer(element));  // reuse logic
     }
 
 }

@@ -1,19 +1,23 @@
 import org.calculator.Calculator;
+import org.calculator.Context;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.streams.InStream;
 import org.streams.OutputStream;
 
 import java.io.ByteArrayInputStream;
+import java.io.Console;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class InputOutputTest {
     private Calculator calculator;
+    private Context ctxt = new Context();
 
     @BeforeEach
     public void setUp() {
-        calculator = new Calculator();
+        ctxt.setTestMode(true);
+        calculator = new Calculator(ctxt);
         calculator.reset();
     }
 
@@ -26,16 +30,18 @@ public class InputOutputTest {
     @Test
     void testReadLineFromString() {
         // As if the user had typed: Hello World <Enter>
-        InStream inStream = new InStream("Hello World\n");
-        Object line = inStream.readLine();
+        InStream input = new InStream("Hello World\n");
+        ctxt.setInputStream(input);
+        Object line = ctxt.getInputStream().readLine();
         assertEquals("Hello World", line);
     }
 
     @Test
     void testReadCodeInputFromString() {
         // As if the user had typed: Hello World <Enter>
-        InStream inStream = new InStream("3 (8)(9~)(4!4$_1+$@)@ \n");
-        Object line = inStream.readLine();
+        InStream input = new InStream("3 (8)(9~)(4!4$_1+$@)@ \n");
+        ctxt.setInputStream(input);
+        Object line = ctxt.getInputStream().readLine();
         assertEquals("3 (8)(9~)(4!4$_1+$@)@", line);
     }
 
@@ -45,9 +51,10 @@ public class InputOutputTest {
         System.setIn(new ByteArrayInputStream(simulatedInput.getBytes())); // Redirect System.in
 
         InStream inStream = new InStream();  // Will now read from simulated System.in
-        Object line = inStream.readLine();
+        ctxt.setInputStream(inStream);
+        Object line = ctxt.getInputStream().readLine();
 
-        assertEquals("42", line);
+        assertEquals((Integer) 42, line);
     }
 
     @Test
@@ -57,20 +64,19 @@ public class InputOutputTest {
         calculator.push(2.50); // too many decimals
         calculator.push("4!4$_1+$@"); // string
         calculator.push(-3.5670); // string
-        OutputStream out = new OutputStream();
-        StringBuilder line1 = out.write(calculator.pop());
-        assertEquals("-3.567", line1.toString());
+        String line1 = ctxt.getOutputStream().write(calculator.pop(), true);
+        assertEquals("-3.567", line1);
 
-        StringBuilder line2 = out.write(calculator.pop());
-        assertEquals("4!4$_1+$@", line2.toString());
+        String line2 = ctxt.getOutputStream().write(calculator.pop(), true);
+        assertEquals("4!4$_1+$@", line2);
 
-        StringBuilder line3 = out.write(calculator.pop());
-        assertEquals("2.5", line3.toString());
+        String line3 = ctxt.getOutputStream().write(calculator.pop(),true);
+        assertEquals("2.5", line3);
 
-        StringBuilder line4 = out.write(calculator.pop());
-        assertEquals("8", line4.toString());
+        String line4 = ctxt.getOutputStream().write(calculator.pop(),true);
+        assertEquals("8", line4);
 
-        StringBuilder line5 = out.write(calculator.pop());
-        assertEquals("-3", line5.toString());
+        String line5 = ctxt.getOutputStream().write(calculator.pop(), true);
+        assertEquals("-3", line5);
     }
 }

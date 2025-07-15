@@ -24,7 +24,7 @@ public class Context {
     private String commandStream;
     private Stack<Object> dataStack;
     private IStream inStream, outStream;
-
+    private boolean testMode = false;
 
     /**
      * initialization when turning on
@@ -35,6 +35,14 @@ public class Context {
         this.dataStack = new Stack<>();
         this.inStream = new InStream();
         outStream = new OutputStream();
+    }
+
+    public void setTestMode(boolean mode) {
+        this.testMode = mode;
+    }
+
+    public boolean isTestMode() {
+        return testMode;
     }
 
     // Input stream
@@ -59,8 +67,8 @@ public class Context {
         this.outStream = outStream;
     }
 
-    public StringBuilder writeOutput(Object o) {
-        return this.outStream.write(o);
+    public String writeOutput(Object o) {
+        return this.outStream.write(o, this.testMode);
     }
 
     // Command Stream
@@ -113,11 +121,12 @@ public class Context {
         return dataStack.size();
     }
 
-    public void setStackSize(Integer stackSize) {}
+    public void setStackSize(int stackSize) {
+        dataStack.setSize(stackSize);
+    }
 
 
     // not used at this point
-
     public Integer nextInt() {
         if (!dataStack.isEmpty()) {
             Object token = dataStack.peek();
@@ -146,16 +155,4 @@ public class Context {
 
         throw new CalculatorException("Expected String token on data stack");
     }
-
-//    public String nextBlock() {
-//        if (dataStack.size() > 0) {
-//            Object token = dataStack.peek();
-//            if (token == "(")
-//                // TODO: if we need this then still need to implement
-//                return (String) dataStack.pop();
-//        }
-//
-//        throw new CalculatorException("Expected Block on data stack");
-//    }
-
 }

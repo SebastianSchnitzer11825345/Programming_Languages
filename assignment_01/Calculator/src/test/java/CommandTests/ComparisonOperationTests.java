@@ -1,6 +1,7 @@
 package CommandTests;
 
 import org.calculator.Calculator;
+import org.calculator.Context;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,12 +10,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ComparisonOperationTests {
 
     private Calculator calculator;
-
+    private Context ctxt = new Context();
 
     @BeforeEach
     public void setUp() {
-        calculator = new Calculator();
-
+        ctxt.setTestMode(true);
+        calculator = new Calculator(ctxt);
         calculator.reset();
     }
 
