@@ -10,9 +10,9 @@ package org.parser;
  * • and the numbers of words, letters, digits, white-space char-
  * acters and special characters in the string (for each categorie
  * counted separately).
- * Forexample,iftheinputisabc+25 a3/X)$ (withoutenclosingparen-
+ * For example, if the input is abc+25 a3/X)$ (without enclosing paren-
  * theses), the output string shall be cba+52 3a/X)$. This string con-
- * tains4words,5letters,3digits,1white-spacecharacterand3special
+ * tains 4 words,5 letters,3 digits,1 white-space character and 3 special
  * characters. Please use the data stack to hold all data needed in the
  * computation.
  */

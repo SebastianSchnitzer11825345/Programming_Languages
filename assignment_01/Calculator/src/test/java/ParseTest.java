@@ -6,7 +6,7 @@ import org.parser.Parser;
 import org.registers.RegisterSet;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ParseTest {
+public class   ParseTest {
     private Calculator calculator;
     private Context ctxt = new Context();
 
