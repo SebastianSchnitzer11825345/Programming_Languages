@@ -166,7 +166,7 @@ public class OtherOperationTests {
     public void test_CopyInteger_CopiesCorrectElement() {
         calculator.push("test");
         calculator.push("placeholder");
-        calculator.push(0);
+        calculator.push(2);
 
         calculator.executeCommand('!');
         

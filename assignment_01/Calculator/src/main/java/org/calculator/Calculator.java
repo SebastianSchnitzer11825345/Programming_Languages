@@ -384,20 +384,20 @@ public class Calculator {
     }
 
     private void copy() {
-        Object a = ctxt.pop();
+        Object a = ctxt.peek();
 
-        if(!(a instanceof Integer)) {
-            ctxt.push(a);
-            return;
-        }
-        // TODO: added + 1 as we pop element before, and no equal (for 3 elements in stack,
-        if((Integer) a >= ctxt.getStackSize() + 1 ) {
-            ctxt.push(a);
+        if(!(a instanceof Integer) || (a).equals(ctxt.getStackSize())) {
             return;
         }
 
-        // TODO: nth entry on the data stack (counted from the top of stack) so the other way around
-        ctxt.push(ctxt.getElementAt((Integer) a));
+
+        if((Integer) a < 0 || (Integer) a > ctxt.getStackSize()) {
+            return;
+        }
+
+        a = ctxt.pop();
+
+        ctxt.push(ctxt.getElementAt(ctxt.getStackSize() - (Integer) a));
 
     }
 
