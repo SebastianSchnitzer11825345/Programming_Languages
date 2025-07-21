@@ -400,8 +400,7 @@ public class Calculator {
         ctxt.push(ctxt.getElementAt((Integer) a));
 
     }
-    //TODO Second opinion: Should logic operators on an integer strictly work on 0 and 1 or 0 and any other value?
-    // can compare all integers based on: 0 = false, each other integer value = true
+
     private void land() {
         Object a = ctxt.pop();
         Object b = ctxt.pop();
