@@ -7,7 +7,6 @@ import org.streams.*;
 // TODO: I am not sure this is right
 public class Main {
     public static void main(String[] args) throws ParseException {
-        System.out.println("Hello, World!");
         Context ctxt = new Context();
         Calculator calculator = new Calculator(ctxt);
 
@@ -24,8 +23,10 @@ public class Main {
                 calculator);
         parser.parseAll();
 
-        if (calculator.size() > 0) {
-            System.out.println(calculator.pop());
-        }
+        //TODO: This is more of a workaround than an actual solution to your problem, but for now it gets the job done
+
+            while (calculator.size() > 0) {
+                System.out.println(calculator.pop());
+            }
     }
 }
