@@ -105,6 +105,13 @@ public class Context {
         return dataStack.pop();
     }
 
+    public Object peek() {
+        if(dataStack.isEmpty()) {
+            throw new EmptyStackException();
+        }
+        return dataStack.peek();
+    }
+
     public void removeElementAt (int index) {
         dataStack.removeElementAt(index);
     }

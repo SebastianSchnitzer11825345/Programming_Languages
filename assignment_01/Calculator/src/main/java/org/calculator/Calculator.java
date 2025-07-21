@@ -12,7 +12,7 @@ import java.util.Objects;
 public class Calculator {
 //    private Stack<Object> stack = new Stack<>();
     private Context ctxt;
-    public static final double EPSILON = 0.00001; //TODO find appropiate range
+    public static final double EPSILON = 0.00001;
 
     public Calculator(Context ctx) {
         this.ctxt = ctx;
@@ -433,24 +433,22 @@ public class Calculator {
         }
     }
 
-    // TODO: it should remove counting from top not bottom of stack
-    //      (so remove Element at as in Ctxt doesn't work right)
     private void delete() {
-        Object a = ctxt.pop();
+        Object a = ctxt.peek();
 
-        // TODO: I think in this case just pop, no need to push a back to stack
+        //"Pops only from the data stack if the top entry is not an integer in the appropriate range."
         if(!(a instanceof Integer)) {
-            ctxt.push(a);
             return;
         }
 
-        // TODO: I think in this case just pop, no need to push a back to stack,
-        //       but if a=stackSize, still remove
-        if((Integer) a >= ctxt.getStackSize()) {
-            ctxt.push(a);
+        if((Integer) a >= ctxt.getStackSize()-1) {
             return;
         }
-        ctxt.removeElementAt((Integer) a);
+         a = ctxt.pop();
+
+        ctxt.removeElementAt(ctxt.getStackSize() - (Integer) a);
+
+
 
     }
 
