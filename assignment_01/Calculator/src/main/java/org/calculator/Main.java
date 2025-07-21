@@ -23,5 +23,9 @@ public class Main {
                 calculator.getContext().getCommandStream(),
                 calculator);
         parser.parseAll();
+
+        if (calculator.size() > 0) {
+            System.out.println(calculator.pop());
+        }
     }
 }
