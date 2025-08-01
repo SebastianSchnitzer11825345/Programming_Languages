@@ -28,7 +28,7 @@ public class Parser {
             calculator.getContext().removeExecCharFromCommandStream();
             parseElement(currChar);
             // TODO: remove when all is working
-            System.out.println("** From Parser ** current command stream is : " + calculator.getContext().getCommandStream());
+//            System.out.println("** From Parser ** Current state is: " + calculator.getContext().toString());
         }
 
     }

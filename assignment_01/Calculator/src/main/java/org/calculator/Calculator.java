@@ -11,7 +11,10 @@ import java.util.Objects;
     simply stops its execution and gives an error message.
      - we need this for example when we are calling " to write output
        and there is nothing else left on data stack
+    TODO: also need to exit when error occurs during parsing (e.g. entering ':'
+     which is no command)
  */
+
 
 /**
  * Calculator handles operations on state from context
@@ -50,6 +53,7 @@ public class Calculator {
         ctxt.reset();
     }
 
+    // TODO: check this section, first element popped is always second (so b) and then a
     public void executeCommand(char command) {
         switch (command) {
             case '+':
@@ -119,8 +123,8 @@ public class Calculator {
 
 
     private void add() {
-        Object a = ctxt.pop();
         Object b = ctxt.pop();
+        Object a = ctxt.pop();
 
         if(a instanceof String || b instanceof String) {
             ctxt.push(String.valueOf(a) + b);
@@ -132,8 +136,8 @@ public class Calculator {
     }
 
     private void subtract() {
-        Object a = ctxt.pop();
         Object b = ctxt.pop();
+        Object a = ctxt.pop();
 
         if(a instanceof String && b instanceof Integer) {
             if((Integer) b < 0 ) {
@@ -160,8 +164,8 @@ public class Calculator {
     }
 
     private void multiply() {
-        Object a = ctxt.pop();
         Object b = ctxt.pop();
+        Object a = ctxt.pop();
         if(a instanceof String && b instanceof String) {
             throw new IllegalArgumentException("Cannot multiply two Strings");
         }
@@ -191,8 +195,8 @@ public class Calculator {
     }
 
     private void divide() {
-        Object a = ctxt.pop();
         Object b = ctxt.pop();
+        Object a = ctxt.pop();
 
         if(a instanceof String && b instanceof String) {
             String stra = (String)a;
@@ -211,8 +215,8 @@ public class Calculator {
     }
 
     private void modulo() {
-        Object a = ctxt.pop();
         Object b = ctxt.pop();
+        Object a = ctxt.pop();
 
         if(a instanceof Float || b instanceof Float) {
             ctxt.push("()");
@@ -480,7 +484,7 @@ public class Calculator {
 
     public void applyImmediately() {
         Object command = ctxt.pop();
-        System.out.println("command popped from datastack: " + command);
+//        System.out.println("command popped from datastack: " + command);
         ctxt.addToCommandStreamInFront((String) command);
     }
 

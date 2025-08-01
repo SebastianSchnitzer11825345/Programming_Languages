@@ -2,14 +2,14 @@ package org.calculator;
 
 import java.util.EmptyStackException;
 import java.util.Stack;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.registers.IReadOnlyRegisters;
 import org.registers.RegisterSet;
 import org.streams.IStream;
 import org.streams.InStream;
 import org.streams.OutputStream;
-
-
 
 /**
  * Context captures data elements of calculator that exist in a state
@@ -27,6 +27,7 @@ public class Context {
     private StringBuilder commandStream = new StringBuilder();
     private Stack<Object> dataStack;
     private IStream inStream, outStream;
+    // TODO: only used for current testing, remove later if not needed
     private boolean testMode = false;
 
     /**
@@ -152,6 +153,19 @@ public class Context {
         return dataStack.size();
     }
 
+    @Override
+    public String toString() {
+        List<String> result = new ArrayList<>();
+        for (Object e : dataStack) {
+            result.add(e.toString());
+        }
+        result.add(String.valueOf('\u25B9'));
+        int insertionPoint = result.size();
+        result.add(insertionPoint, commandStream.toString());
+
+        return String.join(" ", result);
+    }
+    // TODO: delete this whole section later if not used
     public void setStackSize(int stackSize) {
         dataStack.setSize(stackSize);
     }

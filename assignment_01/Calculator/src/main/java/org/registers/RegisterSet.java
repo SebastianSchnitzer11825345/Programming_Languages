@@ -17,10 +17,16 @@ public class RegisterSet implements IReadOnlyRegisters {
 
     private void initializeRegisters(Map<Character, Object> temp) {
         // Set predefined content of register 'a'
-        temp.put('a',reg_a_contents());
+        temp.put('a',reg_a_welcome());
+
+        temp.put('b',reg_b_loop());
+
+        temp.put('c',reg_c_if_then());
+
+        temp.put('d', reg_d_factorial());
 
         // b–z, as a already taken
-        for (char c = 'b'; c <= 'z'; c++) {
+        for (char c = 'e'; c <= 'z'; c++) {
             temp.put(c, defaultValue(c));
         }
 
@@ -35,7 +41,7 @@ public class RegisterSet implements IReadOnlyRegisters {
         }
     }
 
-    private String reg_a_contents() {
+    private String reg_a_welcome() {
         StringBuilder contents = new StringBuilder();
         contents.append("(Welcome to calculator)");
         contents.append('"');
@@ -43,21 +49,49 @@ public class RegisterSet implements IReadOnlyRegisters {
         contents.append('"');
         contents.append('\''); // READ input from User and  add to data stack
         contents.append('@'); // EXECute command from top of data stack
-        contents.append('#'); // push size of data stack on top
-        // TODO: how figure out how to call the right register based on the stack size
-        contents.append('b'); // call register b to output data stack
-        // LOOP
+        contents.append('\"'); // command to OUTput top element on data stack
+        contents.append('b'); // LOOP back to a
+        contents.append('@'); // call b again to RESTART
         return contents.toString();
     }
 
     /**
-     * use b for calling stack output
-     * limit data stack to 10 elements
+     * use b for second call without another welcome message
      * @return String content of b register
      */
-    private String reg_b_contents() {
-//        return "\"\"\"\"\"";
-        return "\"".repeat(10); // limit size of stack to 10
+    private String reg_b_loop() {
+        StringBuilder contents = new StringBuilder();
+        contents.append("(Enter expression and press enter) ");
+        contents.append('"');
+        contents.append('\''); // READ input from User and  add to data stack
+        contents.append('@'); // EXECute command from top of data stack
+        contents.append('\"'); // command to OUTput top element on data stack
+        contents.append('b');
+        contents.append('@'); // call b again to RESTART
+        return contents.toString();
+    }
+
+    /**
+     * Testing boolean from exercise
+     * @return String
+     */
+    private String reg_c_if_then() {
+        StringBuilder contents = new StringBuilder();
+        contents.append("1 "); // starting stack (1 is true)
+        contents.append("8)(9~)(4!4$_1+$@)@");
+        return contents.toString();
+    }
+
+    /**
+     * Testing factorial recursive loop from exercise
+     * @return String
+     */
+    private String reg_d_factorial() {
+        String factorial_Input = "(A)3!3$3!@2$";
+        String C = "4!4$_1+$@";
+        String A = "3!3!1-2!1=()5!(C)@2$*";
+        A = A.replace("C",C);
+        return factorial_Input.replace("A",A);
     }
 
     private Object defaultValue(char name) {

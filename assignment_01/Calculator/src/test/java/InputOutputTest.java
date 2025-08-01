@@ -164,6 +164,8 @@ public class InputOutputTest {
         String output = calculator.getContext().getOutputStream().getTestOuput(true);
         // just debugging, delete later
 //        System.out.println("Output is :" + output);
+        System.out.println(calculator.getContext().getOutputForTest());
         assertEquals("one\ntwo\nthree\nfour\nfive", output);
     }
+
 }
