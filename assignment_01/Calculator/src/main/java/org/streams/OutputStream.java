@@ -31,34 +31,51 @@ public class OutputStream implements IStream {
      * @param o Object to write to the stream.
      */
     @Override
-    public String write(Object o, Boolean testMode ) {
+    public void write(Object o, Boolean testMode ) {
         if (testMode) {
-            return writeOutputToBuffer(o);  // test mode: return StringBuilder
+            writeOutputToBuffer(o);  // test mode: return StringBuilder
         } else {
             writeOutputToScreen(o);         // run mode: print to screen
-            return null;
         }
-
     }
 
-    public String writeOutputToBuffer(Object o) {
-        buffer.setLength(0);
+    public String getTestOuput(Boolean testMode) {
+        if (testMode) {
+            return buffer.toString();  // test mode: return StringBuilder
+        } else {
+            throw new UnsupportedOperationException("Cannot get output if not in Test mode");
+        }
+    }
 
+    public void writeOutputToBuffer(Object o) {
+        if (!buffer.isEmpty()) {
+            buffer.append("\n");
+        }
+        buffer.append(processOutput(o));
+    }
+
+    /**
+     * Helper method
+     * @param o Object type
+     * @return String
+     */
+    public String processOutput(Object o) {
+        StringBuilder element = new StringBuilder();
         if (o instanceof Integer || o instanceof String) {
-            buffer.append(o);
+            element.append(o);
         } else if (o instanceof Double) {
             double d = (Double) o;
             if (d == (long) d) {
-                buffer.append((long) d);
+                element.append((long) d);
             } else {
-                buffer.append(d);
+                element.append(d);
             }
         }
-        return buffer.toString();
+        return element.toString();
     }
 
     public void writeOutputToScreen(Object element) {
-        System.out.println(writeOutputToBuffer(element));  // reuse logic
+        System.out.println(processOutput(element));
     }
 
 }

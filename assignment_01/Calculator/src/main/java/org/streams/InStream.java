@@ -1,5 +1,7 @@
 package org.streams;
 
+import org.calculator.Context;
+
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -22,7 +24,8 @@ public class InStream implements IStream {
 
     /**
      * char by char reading
-     * @return
+     *
+     * @return int
      */
     public int read() {
         try {
@@ -39,12 +42,11 @@ public class InStream implements IStream {
      * point number, or string, depending on the contents.
      * If input is a string containing the sequence of ASCII characters.
      * Non-ASCII characters shall be ignored.
+     *
      * @return line (input read)
      */
     @Override
     public Object readLine() {
-//            System.out.print("> ");
-//            System.out.print("Press Enter to terminate input stream:");
         String line = readLineAsString();
         if (line == null) return null;
         try {
@@ -53,7 +55,7 @@ public class InStream implements IStream {
             try {
                 return Double.parseDouble(line);
             } catch (NumberFormatException e2) {
-                return line;
+                return line; // return trimmed ASCII-clean string
             }
         }
     }
@@ -61,22 +63,40 @@ public class InStream implements IStream {
     public String readLineAsString() {
         try {
             String line = reader.readLine();
-            return line != null ? line.trim() : null;
+            if (line != null) {
+                // Remove non-ASCII characters
+                line = line.replaceAll("[^\\x00-\\x7F]", "");
+                // trim any leading or trailing spaces
+                line = line.trim();
+            }
+            return line;
         } catch (IOException e) {
             throw new RuntimeException("Error reading input", e);
         }
     }
 
     @Override
-    public String write(Object o, Boolean testMode) {
+    public void write(Object o, Boolean testMode) {
         throw new UnsupportedOperationException("Cannot write to input stream");
     }
 
-
-    public static void main(String[] args) {
-        InStream inStream = new InStream();
-        System.out.print("Please type something: ");
-        Object line = inStream.readLine();
-        System.out.println("You typed: " + line);
+    @Override
+    public String getTestOuput(Boolean testMode) {
+        throw new UnsupportedOperationException("Cannot write to input stream");
     }
+
+    /**
+     * Method to test input stream with keyboard
+     * Tested with
+     * café ☕ --> You entered: caf
+     * @param args
+     */
+    public static void main(String[] args){
+        Context ctxt = new Context();
+        ctxt.setInputStream(new InStream());
+        System.out.println("Please type something and press Enter:");
+        Object input = ctxt.readInput();
+        System.out.println("You entered: " + input);
+    }
+
 }

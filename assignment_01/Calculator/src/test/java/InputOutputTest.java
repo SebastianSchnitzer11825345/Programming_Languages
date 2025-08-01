@@ -2,17 +2,22 @@ import org.calculator.Calculator;
 import org.calculator.Context;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.parser.Parser;
 import org.streams.InStream;
-import org.streams.OutputStream;
 
 import java.io.ByteArrayInputStream;
-import java.io.Console;
+import java.util.Stack;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * this test only works with data stack, input and output stream.
+ * no use of command stream
+ */
 public class InputOutputTest {
     private Calculator calculator;
-    private Context ctxt = new Context();
+    private final Context ctxt = new Context();
 
     @BeforeEach
     public void setUp() {
@@ -21,7 +26,6 @@ public class InputOutputTest {
         calculator.reset();
     }
 
-
     @Test
     void testAddition() {
         assertEquals(2, 1 + 1);
@@ -29,20 +33,39 @@ public class InputOutputTest {
 
     @Test
     void testReadLineFromString() {
-        // As if the user had typed: Hello World <Enter>
+        // Using input As if the user had typed
         InStream input = new InStream("Hello World\n");
         ctxt.setInputStream(input);
-        Object line = ctxt.getInputStream().readLine();
+        Object line = ctxt.readInput();
         assertEquals("Hello World", line);
     }
 
+
     @Test
     void testReadCodeInputFromString() {
-        // As if the user had typed: Hello World <Enter>
+        // Using input As if the user had typed
         InStream input = new InStream("3 (8)(9~)(4!4$_1+$@)@ \n");
         ctxt.setInputStream(input);
-        Object line = ctxt.getInputStream().readLine();
+        Object line = ctxt.readInput();
         assertEquals("3 (8)(9~)(4!4$_1+$@)@", line);
+    }
+
+    @Test
+    void testReadCodeWithNonASCII() {
+        // Using input As if the user had typed
+        InStream input = new InStream("äbc(d)");
+        ctxt.setInputStream(input);
+        Object line = ctxt.readInput();
+        assertEquals("bc(d)", line);
+    }
+
+    @Test
+    void testReadCodeWithNonASCIIPicture() {
+        // Using input As if the user had typed
+        InStream input = new InStream("café ☕ ");
+        ctxt.setInputStream(input);
+        Object line = ctxt.readInput();
+        assertEquals("caf", line);
     }
 
     @Test
@@ -52,9 +75,9 @@ public class InputOutputTest {
 
         InStream inStream = new InStream();  // Will now read from simulated System.in
         ctxt.setInputStream(inStream);
-        Object line = ctxt.getInputStream().readLine();
+        Object line = ctxt.readInput();
 
-        assertEquals((Integer) 42, line);
+        assertEquals(42, line);
     }
 
     @Test
@@ -64,19 +87,83 @@ public class InputOutputTest {
         calculator.push(2.50); // too many decimals
         calculator.push("4!4$_1+$@"); // string
         calculator.push(-3.5670); // string
-        String line1 = ctxt.getOutputStream().write(calculator.pop(), true);
-        assertEquals("-3.567", line1);
 
-        String line2 = ctxt.getOutputStream().write(calculator.pop(), true);
-        assertEquals("4!4$_1+$@", line2);
+        int startStackSize = calculator.getContext().getStackSize();
 
-        String line3 = ctxt.getOutputStream().write(calculator.pop(),true);
-        assertEquals("2.5", line3);
+        for (int i = 1; i <= startStackSize; i++) {
+            calculator.writeOutput(); // repeat for each stack element
+        }
 
-        String line4 = ctxt.getOutputStream().write(calculator.pop(),true);
-        assertEquals("8", line4);
+        String output = calculator.getContext().getOutputForTest();
+        StringBuilder expectedOutput = new StringBuilder();
+        expectedOutput.append("-3.567");
+        expectedOutput.append("\n");
+        expectedOutput.append("4!4$_1+$@");
+        expectedOutput.append("\n");
+        expectedOutput.append("2.5");
+        expectedOutput.append("\n");
+        expectedOutput.append("8");
+        expectedOutput.append("\n");
+        expectedOutput.append("-3");
 
-        String line5 = ctxt.getOutputStream().write(calculator.pop(), true);
-        assertEquals("-3", line5);
+        assertEquals(expectedOutput.toString(), output);
+
+    }
+
+    @Test
+    void testOutputStackWithOneElement() throws Exception {
+        calculator.getContext().clearCommandStream();
+        calculator.push("one");
+        calculator.getContext().addToCommandStreamInFront("\"");
+        Parser parser = new Parser(calculator);
+        parser.parseAll();
+        String output = calculator.getContext().getOutputStream().getTestOuput(true);
+        assertEquals("one", output);
+    }
+
+    @Test
+    void testOutputStackWithFiveElements() throws Exception {
+        System.out.println("Starting test testOutputStackWithFiveElements...");
+        calculator.getContext().clearCommandStream();
+        calculator.push("five");
+        calculator.push("four");
+        calculator.push("three");
+        calculator.push("two");
+        calculator.push("one");
+        calculator.getContext().addToCommandStreamInFront("\"\"\"\"\""); // manual version
+        Parser parser = new Parser(calculator);
+        parser.parseAll();
+        String output = calculator.getContext().getOutputStream().getTestOuput(true);
+        assertEquals("one\ntwo\nthree\nfour\nfive", output);
+    }
+
+    @Test
+    void testOutputStackWithFiveElementsLoadRegister() throws Exception {
+        System.out.println("Start test testOutputStackWithFiveElementsLoadRegister...");
+        calculator.getContext().clearCommandStream();
+        calculator.push("five");
+        calculator.push("four");
+        calculator.push("three");
+        calculator.push("two");
+        calculator.push("one");
+
+        // TODO: delete later, just for debugging
+//        Stack<Object> datastack = calculator.getContext().getDataStack();
+//        System.out.println("Printing current data stack of size " + calculator.getContext().getStackSize());
+//        for (Object object : datastack) {
+//            System.out.println(object);
+//        }
+
+        char letter = (char) ('A' + calculator.getContext().getStackSize() - 1);
+        String command = letter + "@";
+        calculator.getContext().addToCommandStreamInFront(command);
+//        System.out.println("Current command stream is: " + calculator.getContext().getCommandStream());
+        Parser parser = new Parser(calculator);
+        parser.parseAll();
+//        System.out.println("Current command stream is: " + calculator.getContext().getCommandStream());
+        String output = calculator.getContext().getOutputStream().getTestOuput(true);
+        // just debugging, delete later
+//        System.out.println("Output is :" + output);
+        assertEquals("one\ntwo\nthree\nfour\nfive", output);
     }
 }

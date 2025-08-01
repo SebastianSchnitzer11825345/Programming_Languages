@@ -5,12 +5,18 @@ import org.parser.Parser;
 import java.util.EmptyStackException;
 import java.util.Objects;
 
-//TODO: In addition to above cases, an error is reported if the data stack
-// does not have enough entries. If an error occurs, the calculator
-// simply stops its execution and gives an error message.
+/* TODO:
+    In addition to above cases, an error is reported if the data stack
+    does not have enough entries. If an error occurs, the calculator
+    simply stops its execution and gives an error message.
+     - we need this for example when we are calling " to write output
+       and there is nothing else left on data stack
+ */
 
+/**
+ * Calculator handles operations on state from context
+ */
 public class Calculator {
-//    private Stack<Object> stack = new Stack<>();
     private Context ctxt;
     public static final double EPSILON = 0.00001;
 
@@ -37,6 +43,9 @@ public class Calculator {
         return ctxt.pop();
     }
 
+    /**
+     * clears data stack
+     */
     public void reset() {
         ctxt.reset();
     }
@@ -83,6 +92,8 @@ public class Calculator {
                 applyImmediately();
                 break;
             case '\\':
+                applyLater();
+                break;
             case '#':
                 stackSize();
                 break;
@@ -468,15 +479,27 @@ public class Calculator {
     }
 
     public void applyImmediately() {
-        ctxt.addToCommandStreamInFront(ctxt.pop());
+        Object command = ctxt.pop();
+        System.out.println("command popped from datastack: " + command);
+        ctxt.addToCommandStreamInFront((String) command);
+    }
+
+    /**
+     * TODO: implement
+     * ApplyLater pops a string from the data stack (if the top entry
+     * is a string) and inserts its contents at the end of the command
+     * stream to be executed after everything else currently in this
+     * stream. There is no eﬀect if the top entry is not a string.
+     */
+    public void applyLater() {
     }
 
     public void readInput() {
         Object input = ctxt.readInput();
-        ctxt.addToCommandStreamInFront(input);
+        ctxt.push(input);
     }
 
-    public String writeOutput() {
-        return ctxt.writeOutput(ctxt.pop());
+    public void writeOutput() {
+        ctxt.writeOutput(ctxt.pop());
     }
 }

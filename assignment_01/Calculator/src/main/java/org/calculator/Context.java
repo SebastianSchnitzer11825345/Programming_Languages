@@ -2,6 +2,8 @@ package org.calculator;
 
 import java.util.EmptyStackException;
 import java.util.Stack;
+
+import org.registers.IReadOnlyRegisters;
 import org.registers.RegisterSet;
 import org.streams.IStream;
 import org.streams.InStream;
@@ -13,15 +15,16 @@ import org.streams.OutputStream;
  * Context captures data elements of calculator that exist in a state
  * * Command stream (A stream of characters regarded as commands to be
  *      executed in sequential order. When turned on initialized with
- *      contents of register a
+ *      contents of register a)
  * * Data Stack (empty when calculator switched on)
+ *   - allowed are up to 10 elements on data stack (TODO: check if 10 is enough)
  * * Register set (contain predefined values when switched on)
  * * Input stream
  * * Output stream
  */
 public class Context {
-    private RegisterSet registers ;
-    private String commandStream;
+    private final RegisterSet registers = new RegisterSet() ;
+    private StringBuilder commandStream = new StringBuilder();
     private Stack<Object> dataStack;
     private IStream inStream, outStream;
     private boolean testMode = false;
@@ -30,8 +33,7 @@ public class Context {
      * initialization when turning on
      */
     public Context() {
-        this.registers = new RegisterSet();
-        this.commandStream = ((String) registers.read('a'));
+        commandStream.append(registers.read('a'));
         this.dataStack = new Stack<>();
         this.inStream = new InStream();
         outStream = new OutputStream();
@@ -55,7 +57,7 @@ public class Context {
     }
 
     public Object readInput() {
-        return this.inStream.readLine();
+        return inStream.readLine();
     }
 
     //  Output stream
@@ -67,21 +69,43 @@ public class Context {
         this.outStream = outStream;
     }
 
-    public String writeOutput(Object o) {
-        return this.outStream.write(o, this.testMode);
+    public void writeOutput(Object o) {
+        outStream.write(o, testMode);
+    }
+
+    public String getOutputForTest() {
+        return outStream.getTestOuput(testMode);
     }
 
     // Command Stream
-    public String getCommandStream() {
+    public StringBuilder getCommandStream() {
         return commandStream;
     }
 
-    public void addToCommandStreamInFront(Object command) {
-        this.commandStream = command + this.commandStream;
+//    public void removeExecCharFromCommandStream() {
+//        if (!commandStream.isEmpty()) {
+//            commandStream = commandStream.substring(1);
+//        }
+//    }
+
+    public void removeExecCharFromCommandStream() {
+        if (commandStream.length() > 0) {
+            commandStream.deleteCharAt(0);
+        }
     }
 
-    // Registers
-    public RegisterSet getRegisters() {
+    // TODO: check if Object or String, StringBuilder
+    public void addToCommandStreamInFront(String command) {
+        commandStream.insert(0, command);
+    }
+
+    public void clearCommandStream() {
+        if (testMode)
+            commandStream = new StringBuilder("");
+    }
+
+    // Registers (since read-only using interface to protect)
+    public IReadOnlyRegisters getRegisters() {
         return registers;
     }
 
@@ -112,11 +136,11 @@ public class Context {
         return dataStack.peek();
     }
 
-    public void removeElementAt (int index) {
+    public void removeElementAt(int index) {
         dataStack.removeElementAt(index);
     }
 
-    public Object getElementAt (int index) {
+    public Object getElementAt(int index) {
         return dataStack.get(index);
     }
 
