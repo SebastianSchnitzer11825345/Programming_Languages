@@ -39,12 +39,12 @@ public class AcceptanceTests {
 
     @Test
     public void test_fromAssignment1() throws ParseException {
-        calculator.getContext().addToCommandStreamInFront("(8)(9~)(4!4$_1+$@)@");
+        calculator.getContext().addToCommandStreamInFront("1(8)(9~)(4!4$_1+$@)@");
         Parser parser = new Parser(calculator);
 
         parser.parseAll();
 
-        assertEquals(8, calculator.pop());
+        assertEquals("8", calculator.pop());
     }
 
     @Test
@@ -56,5 +56,16 @@ public class AcceptanceTests {
 
 
         assertEquals(3, calculator.pop());
+    }
+
+    @Test
+    public void test_fromAssignment3() throws ParseException {
+        calculator.getContext().addToCommandStreamInFront("abc+25 a3/X)$");
+        Parser parser = new Parser(calculator);
+
+        parser.parseAll();
+
+
+        assertEquals("cba+52 3a/X)$", calculator.pop());
     }
 }
