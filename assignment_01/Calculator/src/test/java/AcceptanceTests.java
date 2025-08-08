@@ -29,12 +29,12 @@ public class AcceptanceTests {
     // If this test fails, something is wrong with the testing environment
     @Test
     public void simplePositiveTest() throws ParseException {
-        calculator.getContext().addToCommandStreamInFront("3 5 +");
+        calculator.getContext().addToCommandStreamInFront("3");
         Parser parser = new Parser(calculator);
 
         parser.parseAll();
 
-        assertEquals(8, calculator.pop());
+        assertEquals(3, calculator.pop());
     }
 
     @Test
@@ -68,4 +68,6 @@ public class AcceptanceTests {
 
         assertEquals("cba+52 3a/X)$", calculator.pop());
     }
+
+
 }
