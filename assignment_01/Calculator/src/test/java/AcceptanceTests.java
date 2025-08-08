@@ -6,8 +6,11 @@ import org.parser.ParseException;
 import org.parser.Parser;
 import org.streams.InStream;
 
+import java.util.EmptyStackException;
+
 import static org.calculator.Main.run;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AcceptanceTests {
 
@@ -67,6 +70,83 @@ public class AcceptanceTests {
 
 
         assertEquals("cba+52 3a/X)$", calculator.pop());
+    }
+
+    @Test
+    public void test_simpleAdditionWithSpace_WorksCorrectly() throws ParseException {
+        calculator.getContext().addToCommandStreamInFront("5.1 12.3 +");
+        Parser parser = new Parser(calculator);
+
+        parser.parseAll();
+
+        assertEquals(17.4, calculator.pop());
+    }
+
+    @Test
+    public void test_simpleAdditionWithoutSpace_ThrowsEmptyStackException() throws ParseException {
+        calculator.getContext().addToCommandStreamInFront("12 +");
+        Parser parser = new Parser(calculator);
+
+        parser.parseAll();
+
+        assertThrows(EmptyStackException.class, () -> calculator.pop());
+    }
+
+    @Test
+    public void test_arithmeticChain_ReturnsCorrectResult() throws ParseException {
+        calculator.getContext().addToCommandStreamInFront("15 2 3 4 +*-");
+
+        Parser parser = new Parser(calculator);
+        parser.parseAll();
+
+        assertEquals(1, calculator.pop());
+    }
+
+    @Test
+    public void test_arithmeticWithApplyImmediatly_ReturnsCorrectResult() throws ParseException {
+        calculator.getContext().addToCommandStreamInFront("4 3(2*)@+");
+        Parser parser = new Parser(calculator);
+        parser.parseAll();
+
+        assertEquals(10, calculator.pop());
+    }
+
+    @Test
+    public void test_Equal() throws ParseException {
+        calculator.getContext().addToCommandStreamInFront("5 5=");
+        Parser parser = new Parser(calculator);
+        parser.parseAll();
+
+        assertEquals(1, calculator.pop());
+    }
+
+    @Test
+    public void test_EqualAndPrint() throws ParseException {
+        calculator.getContext().addToCommandStreamInFront("4 3+ 10= ");
+
+        Parser parser = new Parser(calculator);
+        parser.parseAll();
+
+        assertEquals(0, calculator.pop());
+    }
+
+    @Test
+    public void test_StringAddition() throws ParseException {
+        calculator.getContext().addToCommandStreamInFront("(Hello ) (World)+ 2024+ ");
+        Parser parser = new Parser(calculator);
+        parser.parseAll();
+
+        assertEquals("Hello World2024", calculator.pop());
+    }
+
+
+    @Test
+    public void test_StringIndexing() throws ParseException {
+        calculator.getContext().addToCommandStreamInFront("(abcdef)(cd)/ ");
+        Parser parser = new Parser(calculator);
+        parser.parseAll();
+
+        assertEquals(2, calculator.pop());
     }
 
 
