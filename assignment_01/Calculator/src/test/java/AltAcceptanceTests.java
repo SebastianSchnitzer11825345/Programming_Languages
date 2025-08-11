@@ -20,7 +20,7 @@ public class AltAcceptanceTests {
 //        System.out.println("State is:" + this.ctxt.toString());
 
         this.calculator = new Calculator(this.ctxt);
-        this.calculator.reset();
+        this.calculator.reset(); // clear data stack
     }
 
     @Test

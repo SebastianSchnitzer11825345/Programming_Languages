@@ -37,7 +37,7 @@ public class RegisterSet implements IReadOnlyRegisters {
         temp.put('l', reg_l_space());
         temp.put('m', reg_m_special());
 
-        // b–z, as a already taken
+        // n–z, as a-m already taken
         for (char c = 'n'; c <= 'z'; c++) {
             temp.put(c, defaultValue(c));
         }
@@ -99,11 +99,11 @@ public class RegisterSet implements IReadOnlyRegisters {
      * @return String
      */
     private String reg_d_factorial() {
-        String factorial_Input = "(A)3!3$3!@2$";
+        String contents = "(A)3!3$3!@2$";
         String C = "4!4$_1+$@";
         String A = "3!3!1-2!1=()5!(C)@2$*";
         A = A.replace("C",C);
-        return factorial_Input.replace("A",A);
+        return contents.replace("A",A);
     }
 
     private String reg_e_stringAnalyser() {
@@ -297,10 +297,6 @@ public class RegisterSet implements IReadOnlyRegisters {
 
         return contents.toString();
     }
-
-
-
-
 
     private Object defaultValue(char name) {
         if (Character.isLowerCase(name)) {
