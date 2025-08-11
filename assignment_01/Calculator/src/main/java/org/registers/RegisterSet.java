@@ -95,7 +95,7 @@ public class RegisterSet implements IReadOnlyRegisters {
     }
 
     /**
-     * Testing factorial recursive loop from exercise
+     * Testing factorial recursive loop from exercise (factorial of 3)
      * @return String
      */
     private String reg_d_factorial() {

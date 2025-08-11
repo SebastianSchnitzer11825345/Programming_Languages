@@ -17,7 +17,6 @@ import org.streams.OutputStream;
  *      executed in sequential order. When turned on initialized with
  *      contents of register a)
  * * Data Stack (empty when calculator switched on)
- *   - allowed are up to 10 elements on data stack (TODO: check if 10 is enough)
  * * Register set (contain predefined values when switched on)
  * * Input stream
  * * Output stream
@@ -27,7 +26,6 @@ public class Context {
     private StringBuilder commandStream = new StringBuilder();
     private Stack<Object> dataStack;
     private IStream inStream, outStream;
-    // TODO: only used for current testing, remove later if not needed
     private boolean testMode = false;
 
     /**
@@ -40,8 +38,15 @@ public class Context {
         outStream = new OutputStream();
     }
 
+    /**
+     * Sets the calculator into test mode and replaces register a with only "@"
+     * @param mode
+     */
     public void setTestMode(boolean mode) {
         this.testMode = mode;
+        clearCommandStream();
+        String startCommand = "@";
+        addToCommandStreamInFront(startCommand);
     }
 
     public boolean isTestMode() {
@@ -83,21 +88,26 @@ public class Context {
         return commandStream;
     }
 
-//    public void removeExecCharFromCommandStream() {
-//        if (!commandStream.isEmpty()) {
-//            commandStream = commandStream.substring(1);
-//        }
-//    }
-
     public void removeExecCharFromCommandStream() {
-        if (commandStream.length() > 0) {
+        if (!commandStream.isEmpty()) {
             commandStream.deleteCharAt(0);
         }
     }
 
-    // TODO: check if Object or String, StringBuilder
+    /**
+     * Adds input to Command stream at the front, should be string format
+     * @param command as String
+     */
     public void addToCommandStreamInFront(String command) {
         commandStream.insert(0, command);
+    }
+
+    /**
+     * Adds input to Command stream at the end, should be string format
+     * @param command as String
+     */
+    public void addToCommandStreamInBack(String command) {
+        commandStream.append(command);
     }
 
     public void clearCommandStream() {
@@ -139,6 +149,7 @@ public class Context {
 
     public void removeElementAt(int index) {
         dataStack.removeElementAt(index);
+
     }
 
     public Object getElementAt(int index) {

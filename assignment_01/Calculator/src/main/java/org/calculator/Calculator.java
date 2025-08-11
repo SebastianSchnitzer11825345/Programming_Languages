@@ -401,10 +401,9 @@ public class Calculator {
     private void copy() {
         Object a = ctxt.peek();
 
-        if(!(a instanceof Integer) || (a).equals(ctxt.getStackSize())) {
+        if(!(a instanceof Integer) ) {
             return;
         }
-
 
         if((Integer) a < 0 || (Integer) a > ctxt.getStackSize()) {
             return;
@@ -412,7 +411,8 @@ public class Calculator {
 
         a = ctxt.pop();
 
-        ctxt.push(ctxt.getElementAt(ctxt.getStackSize() - (Integer) a));
+        // add one to stack size because we already popped a element on top
+        ctxt.push(ctxt.getElementAt(ctxt.getStackSize() + 1 - (Integer) a));
 
     }
 
@@ -448,22 +448,19 @@ public class Calculator {
     }
 
     private void delete() {
-        Object a = ctxt.peek();
+        Object a = ctxt.pop(); // pop a either way
 
         //"Pops only from the data stack if the top entry is not an integer in the appropriate range."
         if(!(a instanceof Integer)) {
             return;
         }
 
-        if((Integer) a >= ctxt.getStackSize()-1) {
+        if((Integer) a > ctxt.getStackSize()) {
             return;
         }
-         a = ctxt.pop();
 
+        // counting from top of stack
         ctxt.removeElementAt(ctxt.getStackSize() - (Integer) a);
-
-
-
     }
 
 
@@ -484,18 +481,24 @@ public class Calculator {
 
     public void applyImmediately() {
         Object command = ctxt.pop();
-//        System.out.println("command popped from datastack: " + command);
+        if(!(command instanceof String)) {
+            return;
+        }
         ctxt.addToCommandStreamInFront((String) command);
     }
 
     /**
-     * TODO: implement
      * ApplyLater pops a string from the data stack (if the top entry
      * is a string) and inserts its contents at the end of the command
      * stream to be executed after everything else currently in this
      * stream. There is no eﬀect if the top entry is not a string.
      */
     public void applyLater() {
+        Object command = ctxt.pop();
+        if(!(command instanceof String)) {
+            return;
+        }
+        ctxt.addToCommandStreamInBack((String) command);
     }
 
     public void readInput() {
