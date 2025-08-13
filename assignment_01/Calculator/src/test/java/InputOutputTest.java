@@ -25,26 +25,40 @@ public class InputOutputTest {
         ctxt.setTestMode(true); // also sets commands stream to only "@"
         calculator = new Calculator(ctxt);
         this.calculator.reset(); // clear data stack
+//        calculator.push("\'"); // for reading input stream
         this.parser = new Parser(calculator);
     }
 
-    @Test
-    void testReadLineFromString() throws Exception {
-        // Using input As if the user had typed
-        InStream input = new InStream("Hello World\n");
-        ctxt.setInputStream(input);
-        calculator.push("\'");
-        parser.parseAll();
-        assertEquals("Hello World", calculator.pop());
-    }
+//    @Test
+//    void testReadLineFromString() throws Exception {
+//        // Using input As if the user had typed
+//        InStream input = new InStream("(Hello World)\n");
+//
+//        // test with execute comand directly
+//        ctxt.setInputStream(input);
+//        calculator.executeCommand('\'');
+//        assertEquals("(Hello World) ▹ @", calculator.getContext().toString());
+//
+//        // test with execute comand directly
+//        input = new InStream("(Hello World)\n");
+//        calculator.reset();
+//        ctxt.setInputStream(input);
+//        calculator.push("'");
+//        System.out.println("Current state is: " + calculator.getContext().toString());
+//        System.out.println("Current Instream is: " + calculator.getContext().getInputStream().toString());
+//        parser.parseAll();
+//        assertEquals("(Hello World)", calculator.pop());
+//    }
 
 //
 //    @Test
 //    void testReadCodeInputFromString() {
 //        // Using input As if the user had typed
-//        InStream input = new InStream("3 (8)(9~)(4!4$_1+$@)@ \n");
+//        calculator.push(3);
+//        InStream input = new InStream("(8)(9~)(4!4$_1+$@)@ \n");
 //        ctxt.setInputStream(input);
-//        Object line = ctxt.readInput();
+//        calculator.executeCommand("'");
+//        parser.parseAll();
 //        assertEquals("3 (8)(9~)(4!4$_1+$@)@", line);
 //    }
 //

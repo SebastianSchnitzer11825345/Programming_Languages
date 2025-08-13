@@ -166,7 +166,7 @@ public class OtherOperationTests {
     public void test_CopyInteger_CopiesCorrectElement() {
         calculator.push("test");
         calculator.push("placeholder");
-        calculator.push(2);
+        calculator.push(3);
 
         calculator.executeCommand('!');
         
@@ -249,7 +249,7 @@ public class OtherOperationTests {
 
         calculator.executeCommand('$');
 
-        assertEquals(2, calculator.size());
+        assertEquals(1, calculator.size());
     }
 
     @Test
@@ -259,7 +259,7 @@ public class OtherOperationTests {
 
         calculator.executeCommand('$');
 
-        assertEquals(2, calculator.size());
+        assertEquals(1, calculator.size());
     }
 
     @Test

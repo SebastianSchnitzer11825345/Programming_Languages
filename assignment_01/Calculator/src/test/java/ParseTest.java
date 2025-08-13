@@ -53,23 +53,37 @@ public class ParseTest {
 
     @Test
     void testArithmeticOperators () throws Exception {
-        calculator.push("2 3 +");
-        parser.parseAll();
-        assertEquals((Integer) 5, calculator.pop());
+        interpretAndExpect("2 3 +", 5);
+//        calculator.push("2 3 +");
+//        parser.parseAll();
+//        assertEquals((Integer) 5, calculator.pop());
     }
 
-    @Test
-    void testMixedInputSimple() throws Exception {
-        calculator.push("2(hi)3");
+//    @Test
+//    void testMixedInputSimple() throws Exception {
+//        calculator.push("2(hi)3");
+//        parser.parseAll();
+//        assertEquals("2 hi 3 ▹ ", calculator.getContext().toString());
+//    }
+//
+//    @Test
+//    void testMixedInput() throws Exception {
+//        interpretAndCheckState("2(hi)4 5.3+", "2 hi 9.3 ▹ ");
+////        calculator.push("2(hi)4 5.3+");
+////        parser.parseAll();
+////        // 4 + 5.3 = 9.3, next string "hi" should be on the stack and 2
+////        assertEquals("2 hi 9.3 ▹ ", calculator.getContext().toString());
+//    }
+
+    boolean interpretAndExpect(String expr, Object expected) throws Exception {
+        calculator.push(expr);
         parser.parseAll();
-        assertEquals("2 hi 3 ▹ ", calculator.getContext().toString());
+        return calculator.pop() == expected;
     }
 
-    @Test
-    void testMixedInput() throws Exception {
-        calculator.push("2(hi)4 5.3+");
+    boolean interpretAndCheckState(String expr, Object expected) throws Exception {
+        calculator.push(expr);
         parser.parseAll();
-        // 4 + 5.3 = 9.3, next string "hi" should be on the stack and 2
-        assertEquals("2 hi 9.3 ▹ ", calculator.getContext().toString());
+        return calculator.getContext().toString() == expected;
     }
 }

@@ -41,8 +41,8 @@ public class ComparisonOperationTests {
 
     @Test
     public void test_GreaterThanWithTwoDifferentIntegers_ReturnsTrue() {
-        calculator.push(2);
         calculator.push(3);
+        calculator.push(2);
 
         calculator.executeCommand('>');
 
@@ -51,8 +51,8 @@ public class ComparisonOperationTests {
 
     @Test
     public void test_GreaterThanTwoDifferentIntegers_ReturnsFalse() {
-        calculator.push(3);
         calculator.push(2);
+        calculator.push(3);
 
         calculator.executeCommand('>');
 
@@ -61,8 +61,8 @@ public class ComparisonOperationTests {
 
     @Test
     public void test_LessThanTwoDifferentIntegers_ReturnsFalse() {
-        calculator.push(3);
         calculator.push(2);
+        calculator.push(3);
 
         calculator.executeCommand('<');
 
@@ -71,8 +71,8 @@ public class ComparisonOperationTests {
 
     @Test
     public void test_LessThanTwoDifferentIntegers_ReturnsTrue() {
-        calculator.push(2);
         calculator.push(3);
+        calculator.push(2);
 
         calculator.executeCommand('<');
 
@@ -101,8 +101,8 @@ public class ComparisonOperationTests {
 
     @Test
     public void test_whenCompareIntegerToFloat_ConvertsCorrectlyAndReturnsTrue() {
-        calculator.push(1.0);
         calculator.push(1);
+        calculator.push(1.0);
 
         calculator.executeCommand('=');
 
@@ -111,8 +111,8 @@ public class ComparisonOperationTests {
 
     @Test
     public void test_whenCompareIntegerToFloat_ConvertsCorrectlyAndReturnsFalse() {
-        calculator.push(1.1);
         calculator.push(1);
+        calculator.push(1.1);
 
         calculator.executeCommand('=');
 
@@ -121,8 +121,8 @@ public class ComparisonOperationTests {
 
     @Test
     public void test_whenCompareIntegerToFloatWithinEpsilon_ConvertsCorrectlyAndReturnsTrue() {
-        calculator.push(1+Calculator.EPSILON);
         calculator.push(1);
+        calculator.push(1+Calculator.EPSILON);
 
         calculator.executeCommand('=');
 
@@ -131,8 +131,8 @@ public class ComparisonOperationTests {
 
     @Test
     public void test_whenCompareIntegerToFloatNotWithinEpsilon_ConvertsCorrectlyAndReturnsFalse() {
-        calculator.push(1+(Calculator.EPSILON*1.1));
         calculator.push(1);
+        calculator.push(1+(Calculator.EPSILON*1.1));
 
         calculator.executeCommand('=');
 

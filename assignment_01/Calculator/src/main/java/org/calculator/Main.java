@@ -11,8 +11,8 @@ public class Main {
     }
 
     public static void run(Calculator calculator) throws ParseException {
-        Parser parser = new Parser(calculator);
-        parser.parseAll();
-
+        calculator.run();
+//        parser = new Parser(calculator);
+//        parser.parseAll();
     }
 }

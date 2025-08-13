@@ -36,11 +36,18 @@ public class RegisterSet implements IReadOnlyRegisters {
         temp.put('k', reg_k_digit());
         temp.put('l', reg_l_space());
         temp.put('m', reg_m_special());
+        temp.put('n', reg_n_callStringAnalyzer());
 
-        // n–z, as a-m already taken
-        for (char c = 'n'; c <= 'z'; c++) {
-            temp.put(c, defaultValue(c));
+        // o–s, as a-m already taken
+        for (char c = 'o'; c <= 'z'; c++) {
+            if (c != 't' && c != 'x') {
+                temp.put(c, defaultValue(c));
+            }
         }
+
+        temp.put('t', reg_t_testMode());
+
+        temp.put('x', "+"); // cause it to terminate due to error
 
         // Populate A–K with increasing numbers of quote characters to print up to 10 elements of data stack
         for (char c = 'A'; c <= 'A' + 10; c++) {
@@ -59,11 +66,22 @@ public class RegisterSet implements IReadOnlyRegisters {
         contents.append('"');
         contents.append("(Enter expression and press enter) ");
         contents.append('"');
+        contents.append('\'');  // READ input from User and  add to data stack
+        contents.append('@');   // EXECute command from top of data stack
+        contents.append('\"');  // command to OUTput top element on data stack
+        contents.append("(Would you like to continue (enter 1) or exit (enter 0) )");
+        contents.append('"');
+        // start of if-then-else loop
         contents.append('\''); // READ input from User and  add to data stack
-        contents.append('@'); // EXECute command from top of data stack
-        contents.append('\"'); // command to OUTput top element on data stack
-        contents.append('b'); // LOOP back to a
-        contents.append('@'); // call b again to RESTART
+        contents.append("(b)"); // if true continue by calling b
+        contents.append("(x)"); // else exit
+        contents.append("c@@"); // if-then-condition
+//        contents.append("@");
+
+//        // TODO: old code, delete later
+//        contents.append("(b)"); // move to LOOP in b
+//        contents.append('@');   // call b again to START LOOP
+
         return contents.toString();
     }
 
@@ -78,8 +96,16 @@ public class RegisterSet implements IReadOnlyRegisters {
         contents.append('\''); // READ input from User and  add to data stack
         contents.append('@'); // EXECute command from top of data stack
         contents.append('\"'); // command to OUTput top element on data stack
-        contents.append('b');
-        contents.append('@'); // call b again to RESTART
+
+        // start of if-then-else loop
+        contents.append("(Would you like to continue (enter 1) or exit (enter 0) )");
+        contents.append('"');
+        // start of if-then-else loop
+        contents.append('\''); // READ input from User and  add to data stack
+        contents.append("(b)"); // if true continue by calling b
+        contents.append("(x)"); // else exit
+        contents.append("c"); // if-then-condition
+        contents.append("@"); // if-then-condition
         return contents.toString();
     }
 
@@ -89,8 +115,10 @@ public class RegisterSet implements IReadOnlyRegisters {
      */
     private String reg_c_if_then() {
         StringBuilder contents = new StringBuilder();
-        contents.append("1 "); // starting stack (1 is true)
-        contents.append("(8)(9~)(4!4$_1+$@)@");
+        contents.append("(4!4$_1+$@)@");
+//        // TODO: old code, delete later
+//        contents.append("1 "); // starting stack (1 is true)
+//        contents.append("(8)(9~)(4!4$_1+$@)@");
         return contents.toString();
     }
 
@@ -106,18 +134,23 @@ public class RegisterSet implements IReadOnlyRegisters {
         return contents.replace("A",A);
     }
 
+    /**
+     * Press e@
+     * @return
+     */
     private String reg_e_stringAnalyser() {
         StringBuilder contents = new StringBuilder();
         contents.append("(Enter string to analyse) ");
         contents.append('"');
         contents.append('\''); //Read input string
-        contents.append('@');
-        contents.append('0'); // starting index
-        contents.append("0 0 0 0 0"); //Counters for word, letter, digit, space, special characters
-        contents.append("0"); //currentWord (for word reversing)
+//        contents.append('@');
+        contents.append("0 "); // starting index
+        contents.append("0 0 0 0 0 "); //Counters for word, letter, digit, space, special characters
+        contents.append("0 "); //currentWord (for word reversing)
         contents.append("()"); // output string
-        contents.append('f'); // jump tp main loop
+        contents.append('f'); // jump to main loop
         contents.append('@');
+        contents.append(')');
 
         return contents.toString();
     }
@@ -126,15 +159,21 @@ public class RegisterSet implements IReadOnlyRegisters {
         StringBuilder contents = new StringBuilder();
 
         contents.append("9!"); //copy index
-        contents.append("10!%"); //get char at index from input string
+        contents.append("11!11!%"); //get char at index from input string
 
 
         contents.append("()="); // check for end of string
-        contents.append("(g)@"); // if yes, go to output
-        contents.append("_"); // if no, continue
 
-        contents.append("9!"); //Copy char again
-        contents.append("(h)@"); // Call helper function, pushes category: 0=letter, 1=digit, 2=space, 3=special
+        contents.append("(g)"); // if yes, go to output
+        contents.append("(_)"); // if no, continue
+        contents.append("c@"); // execute if - then
+
+        // old code
+//        contents.append("(g)@"); // if yes, go to output
+//        contents.append("_"); // if no, continue
+
+        contents.append("10!"); //Copy char index again (now at another index)
+        contents.append("(h)@@"); // Call helper function, pushes category: 0=letter, 1=digit, 2=space, 3=special
 
         contents.append("3!"); // Check if char is a letter
         contents.append("0=");
@@ -174,30 +213,42 @@ public class RegisterSet implements IReadOnlyRegisters {
 
     private String reg_h_classifier() {
         StringBuilder contents = new StringBuilder();
-
-        contents.append("%"); //Get Ascii code of letter
-
+        contents.append("12!12!%"); //get char at index from input string (first copy entire word, then index, then call index) and Ascii code of letter
         //65-90, 97-122 --> Letter
-        contents.append("65>"); //
-        contents.append("1"); // not letter
-        contents.append("97<");
-        contents.append("1|"); //
-        contents.append("0_");
+        contents.append("64<"); // include 65
+//        contents.append("1"); // not letter
+        contents.append("13!13!%"); //get char at index from input string (first copy entire word, then index, then call index) and Ascii code of letter
+        contents.append("96>"); // include 97
+//        contents.append("1|"); //
+        contents.append("|"); // either small or large capital letter
+        contents.append("_"); // 0 for letter, 1 if not
 
 
         //48-57 --> Digit
-        contents.append("48<");
-        contents.append("57>");
-        contents.append("&");
-        contents.append("1&");
-        contents.append("1_");
+        contents.append("13!13!%"); //get char at index from input string (first copy entire word, then index, then call index)
+        contents.append("47>"); // include 48
+        contents.append("14!14!%"); //get char at index from input string (first copy entire word, then index, then call index)
+        contents.append("58<");
+        contents.append("&"); // both conditions met
+        // TODO: here not yet working, if digit it should replace 0 with 1, otherwise keep 1, but also continue with 2 for next step... or maybe do this later
+//        contents.append("&"); // if 1 there from before (not letter), then capture 1 for Digit
+        contents.append("_1+"); // 1 -> 0 -> 1, 0 -> 1 -> 2
+//        contents.append("1&");
+//        contents.append("1_");
 
         // 32 --> Space
-        contents.append("32=");
-        contents.append("2&");
+        contents.append("2!"); // stack 2 2 or 1 1 or 0 0
+        contents.append("2=+"); // stack 2 1 --> 3 or 1 0 --> 1 or 0 0 --> 0
+        contents.append("14!14!"); //get char at index from input string (first copy entire word, then index, then call index)
+        contents.append("%"); //Get Ascii code of letter
+        contents.append("32="); // 1 if equal (we have stack .... 3 1 (should be 2) or ... 3 0 (should be 3) or ... 1 0 (should be 1) or ... 0 0 (should be 0)
+        contents.append("-"); // 3 for Space
+//        contents.append("2&"); // does not work, there is as both are considered positive not compared 2=2
 
-        // Otherwise Special character
-        contents.append("3|");
+        // Otherwise Special character (not further code required as 3 already set in previous step
+//        contents.append("15!15!"); //get char at index from input string (first copy entire word, then index, then call index)
+//        contents.append("%"); //Get Ascii code of letter
+//        contents.append("3|");
 
         return contents.toString();
     }
@@ -295,6 +346,20 @@ public class RegisterSet implements IReadOnlyRegisters {
 
         contents.append("(f)@"); // loop back
 
+        return contents.toString();
+    }
+
+    private String reg_n_callStringAnalyzer() {
+        StringBuilder contents = new StringBuilder();
+        contents.append("e");
+        return contents.toString();
+    }
+
+    private String reg_t_testMode() {
+        StringBuilder contents = new StringBuilder();
+        contents.append('\''); // READ input from User and  add to data stack
+        contents.append('@'); // EXECute command from top of data stack
+//        contents.append('\"'); // command to OUTput top element on data stack
         return contents.toString();
     }
 

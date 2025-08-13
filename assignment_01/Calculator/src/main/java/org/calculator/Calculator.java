@@ -55,6 +55,7 @@ public class Calculator {
 
     // TODO: check this section, first element popped is always second (so b) and then a
     public void executeCommand(char command) {
+//        try {
         switch (command) {
             case '+':
                 add();
@@ -116,11 +117,16 @@ public class Calculator {
             case '>':
                 comparison('>');
                 break;
+
             default:
                 throw new UnsupportedOperationException("Unsupported command: " + command);
+//            }
+//        } catch (EmptyStackException | IllegalArgumentException e) {
+//            System.err.println("Error executing command " + command + ": " + e.getMessage());
+//            break;
+//            ctxt.clearCommandStream(); // empty command stream and exit
         }
     }
-
 
     private void add() {
         Object b = ctxt.pop();
@@ -227,7 +233,7 @@ public class Calculator {
             }
             ctxt.push((Integer)a % (Integer)b);
         } else if (a instanceof String && b instanceof Integer) {
-                if((Integer) b == 0 || (Integer) b >= ((String) a).length() ) {
+                if( (Integer) b >= ((String) a).length() ) {
                     ctxt.push("()");
                     return;
                 }
@@ -291,8 +297,8 @@ public class Calculator {
     }
 
     private void comparison(char command) {
-        Object a = ctxt.pop();
         Object b = ctxt.pop();
+        Object a = ctxt.pop();
 
         // Case: Both are Strings
         if(a instanceof String && b instanceof String) {
@@ -417,8 +423,8 @@ public class Calculator {
     }
 
     private void land() {
-        Object a = ctxt.pop();
         Object b = ctxt.pop();
+        Object a = ctxt.pop();
 
         if(a instanceof Integer && b instanceof Integer) {
             Integer ia = (Integer) a > 0 ? 1 : 0; // changed the logic as defined above
@@ -508,5 +514,17 @@ public class Calculator {
 
     public void writeOutput() {
         ctxt.writeOutput(ctxt.pop());
+    }
+
+    public void run() throws ParseException {
+        this.getContext().loadRegister('a');
+        Parser parser = new Parser(this);
+        parser.parseAll();
+    }
+
+    public void test() throws ParseException {
+        this.getContext().loadRegister('t');
+        Parser parser = new Parser(this);
+        parser.parseAll();
     }
 }

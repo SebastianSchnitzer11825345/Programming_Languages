@@ -26,9 +26,14 @@ public class Parser {
         while (!calculator.getContext().getCommandStream().isEmpty()) {
             char currChar = calculator.getContext().getCommandStream().charAt(0);
             calculator.getContext().removeExecCharFromCommandStream();
-            parseElement(currChar);
-            // TODO(Alenka): remove when all is working (all tests finished first)
-//            System.out.println("** From Parser ** Current state is: " + calculator.getContext().toString());
+            try {
+                parseElement(currChar);
+            } catch (Exception e) {
+                System.err.println("Error executing command " + currChar + ": " + e.getMessage());
+                break;
+            }
+//            // TODO(Alenka): remove when all is working (all tests finished first)
+            System.out.println("Parsing... Current state is: " + calculator.getContext().toString());
         }
 
     }

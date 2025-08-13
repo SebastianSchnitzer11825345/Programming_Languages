@@ -32,7 +32,7 @@ public class Context {
      * initialization when turning on
      */
     public Context() {
-        commandStream.append(registers.read('a'));
+//        commandStream.append(registers.read('a')); // TODO: move this to .run() in calculator
         this.dataStack = new Stack<>();
         this.inStream = new InStream();
         outStream = new OutputStream();
@@ -120,6 +120,11 @@ public class Context {
         return registers;
     }
 
+    public void loadRegister(char c) {
+        commandStream.append(registers.read(c));
+    }
+
+
     // Data Stack
     public Stack<Object> getDataStack() {
         return dataStack;
@@ -129,7 +134,7 @@ public class Context {
         if(o instanceof Integer || o instanceof Double || o instanceof String) {
             dataStack.push(o);
         } else {
-            throw new IllegalArgumentException("Object to push does not match expected type");
+            throw new IllegalArgumentException("Object to push does not match expected type" + o.getClass());
         }
     }
 
@@ -166,49 +171,19 @@ public class Context {
 
     @Override
     public String toString() {
-        List<String> result = new ArrayList<>();
+        List<String> dataStackState = new ArrayList<>();
         for (Object e : dataStack) {
-            result.add(e.toString());
+            dataStackState.add(e.toString());
         }
-        result.add(String.valueOf('\u25B9'));
-        int insertionPoint = result.size();
-        result.add(insertionPoint, commandStream.toString());
+        StringBuilder state = new StringBuilder();
+        state.append(String.join(" ,", dataStackState));
 
-        return String.join(" ", result);
-    }
-    // TODO: delete this whole section later if not used
-    public void setStackSize(int stackSize) {
-        dataStack.setSize(stackSize);
-    }
-
-
-    // not used at this point
-    public Integer nextInt() {
-        if (!dataStack.isEmpty()) {
-            Object token = dataStack.peek();
-            if (token instanceof Integer)
-                return (Integer) dataStack.pop();
-        }
-        throw new CalculatorException("Expected Integer on data stack");
-    }
-
-    public Double nextDecimal() {
-        if (!dataStack.isEmpty()) {
-            Object token = dataStack.peek();
-            if (token instanceof Double || token instanceof Integer)
-                return (Double) dataStack.pop();
-        }
-
-        throw new CalculatorException("Expected Decimal point number on data stack");
-    }
-
-    public String nextString() {
-        if (!dataStack.isEmpty()) {
-            Object token = dataStack.peek();
-            if (token instanceof String)
-                return (String) dataStack.pop();
-        }
-
-        throw new CalculatorException("Expected String token on data stack");
+        state.append(' ' + String.valueOf('\u25B9') + ' ');
+        state.append(commandStream.toString());
+        return state.toString();
+//
+//        int insertionPoint = result.size();
+//        result.add(insertionPoint, commandStream.toString());
+//        return String.join(" ,", result);
     }
 }
