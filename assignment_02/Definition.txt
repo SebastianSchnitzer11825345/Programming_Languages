@@ -1,0 +1,48 @@
+<program>   ::= <expr>
+
+<expr>      ::= <atom>
+            | <op> <expr>
+
+<atom>      ::= <integer> | <variable>
+
+<op>        ::= def | lamba | cond | <variable> | list | car | cdr | cons
+
+def         ::= (def <name> <expr>)
+
+lamba       ::= (lamba (<param1> <param2> ...) <body>)
+
+list        ::= (list <expr>*)
+
+cond        ::= (cond <condition> <then-expr> <else-expr> ) #conditions handles 0 as false and everything else as true
+
+predefined operations: plus, minus, mult, div, eq, not, gt
+
+predefined variables: true, false
+
+
+
+Some Examples:
+
+(plus 3 4)                              --> 7
+
+(minus (mult 2 5) 4)                    --> 6
+
+(def x 10)
+(plus x 5)                              --> 15
+
+def increment (lamba (x) (plus x 1))
+(increment 3)                           --> 4
+
+(def abs (lamba (n)
+    (cond (gt n 0) n (minus 0 n) )
+))
+(abs -10)                               --> 10
+
+
+(def nums (list 1 2 3))
+(car nums)                              --> 1
+(cdr nums)                              --> (2 3)
+(car (cdr nums))                        --> 2        
+(car (cdr (cdr nums)))                  --> 3
+(cons 0 nums)                           --> (0, 1, 2, 3)
+
