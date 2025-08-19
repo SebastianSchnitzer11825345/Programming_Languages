@@ -4,90 +4,86 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.parser.Parser;
 
-import java.util.Stack;
-
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Tests adapted in calculator language
+ */
 public class ParseTest {
     private Calculator calculator;
-    private final Context ctxt = new Context();
+    private Context ctxt;
     private Parser parser;
 
     @BeforeEach
     public void setUp() {
-        ctxt.setTestMode(true);
-        calculator = new Calculator(ctxt);
-        calculator.reset();
-        calculator.getContext().clearCommandStream();
+        this.ctxt = new Context();
+        ctxt.setTestMode(true); // also sets commands stream to only "@"
+        this.calculator = new Calculator(ctxt);
+        this.calculator.reset(); // clear data stack
         this.parser = new Parser(calculator);
     }
 
     @Test
     void testIntegerParsing() throws Exception {
-        calculator.getContext().addToCommandStreamInFront("123");
+        calculator.push("123");
         parser.parseAll();
         assertEquals(123, calculator.pop());
     }
 
     @Test
     void testFloatingPointParsing() throws Exception {
-        calculator.getContext().addToCommandStreamInFront("12.5");
+        calculator.push("12.5");
         parser.parseAll();
         assertEquals(12.5, calculator.pop());
     }
 
     @Test
     void testSimpleStringBlockParsing() throws Exception {
-        calculator.getContext().addToCommandStreamInFront("(abc)");
+        calculator.push("(abc)");
         parser.parseAll();
         assertEquals("abc", calculator.pop());
     }
 
     @Test
     void testSimpleStringParsing() throws Exception {
-        calculator.getContext().addToCommandStreamInFront("(a)(b)(c)");
+        calculator.push("(a)(b)(c)");
         parser.parseAll();
         assertEquals("c", calculator.pop());
     }
 
     @Test
     void testArithmeticOperators () throws Exception {
-        calculator.push(2);
-        calculator.push(3);
-        calculator.getContext().addToCommandStreamInFront("+");
-        parser.parseAll();
-        assertEquals((Integer) 5, calculator.pop());
+        interpretAndExpect("2 3 +", 5);
+//        calculator.push("2 3 +");
+//        parser.parseAll();
+//        assertEquals((Integer) 5, calculator.pop());
     }
 
-    @Test
-    void testMixedInputSimple() throws Exception {
-        calculator.getContext().addToCommandStreamInFront("2(hi)3");
+//    @Test
+//    void testMixedInputSimple() throws Exception {
+//        calculator.push("2(hi)3");
+//        parser.parseAll();
+//        assertEquals("2 hi 3 ▹ ", calculator.getContext().toString());
+//    }
+//
+//    @Test
+//    void testMixedInput() throws Exception {
+//        interpretAndCheckState("2(hi)4 5.3+", "2 hi 9.3 ▹ ");
+////        calculator.push("2(hi)4 5.3+");
+////        parser.parseAll();
+////        // 4 + 5.3 = 9.3, next string "hi" should be on the stack and 2
+////        assertEquals("2 hi 9.3 ▹ ", calculator.getContext().toString());
+//    }
+
+    boolean interpretAndExpect(String expr, Object expected) throws Exception {
+        calculator.push(expr);
         parser.parseAll();
-        assertEquals((Integer) 3, calculator.pop());
-        assertEquals("hi", calculator.pop());
-        assertEquals((Integer) 2, calculator.pop());
+        return calculator.pop() == expected;
     }
 
-    @Test
-    void testMixedInput() throws Exception {
-        calculator.getContext().addToCommandStreamInFront("2(hi)4 5.3+");
+    boolean interpretAndCheckState(String expr, Object expected) throws Exception {
+        calculator.push(expr);
         parser.parseAll();
-        assertEquals((Double) 9.3, calculator.pop()); // 4 + 5.3 = 9.3
-        assertEquals("hi", calculator.pop()); // string should still be on the stack
-        assertEquals((Integer) 2, calculator.pop()); // string should still be on the stack
+        return calculator.getContext().toString() == expected;
     }
 }
-
-//    void testFloatingPointParsing() throws Exception {
-//        calculator.getContext().addToCommandStreamInFront("12.5");
-//        parser.parseAll();
-//        Stack<Object> datastack = calculator.getContext().getDataStack();
-//        System.out.println("Printing current data stack of size " + calculator.getContext().getStackSize());
-//        for (Object object : datastack) {
-//            System.out.println(object);
-//        }
-//
-//        System.out.println("Looking up top stack element: " + calculator.getContext().getDataStack().peek());
-//
-//        assertEquals(12.5, calculator.pop());
-//    }

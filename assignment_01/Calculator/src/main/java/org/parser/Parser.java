@@ -26,9 +26,14 @@ public class Parser {
         while (!calculator.getContext().getCommandStream().isEmpty()) {
             char currChar = calculator.getContext().getCommandStream().charAt(0);
             calculator.getContext().removeExecCharFromCommandStream();
-            parseElement(currChar);
-            // TODO: remove when all is working
-//            System.out.println("** From Parser ** Current state is: " + calculator.getContext().toString());
+            try {
+                parseElement(currChar);
+            } catch (Exception e) {
+                System.err.println("Error executing command " + currChar + ": " + e.getMessage());
+                break;
+            }
+//            // TODO(Alenka): remove when all is working (all tests finished first)
+            System.out.println("Parsing... Current state is: " + calculator.getContext().toString());
         }
 
     }
@@ -92,7 +97,7 @@ public class Parser {
         // used as plain text if neither ’@’ nor \ is applied to it.
         else {
             if (calculator.getContext().isTestMode()) {
-                System.out.println("Ignored character: " + currChar);
+//                System.out.println("Ignored character: " + currChar);
             }
         }
     }
