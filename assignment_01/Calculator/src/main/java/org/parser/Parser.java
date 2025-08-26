@@ -2,6 +2,8 @@ package org.parser;
 
 import org.calculator.Calculator;
 
+import java.util.Objects;
+
 /**
  *  Class to help with parsing the language of the calculator.
  */
@@ -33,9 +35,13 @@ public class Parser {
                 break;
             }
 //            // TODO(Alenka): remove when all is working (all tests finished first)
-            System.out.println("Parsing... Current state is: " + calculator.getContext().toString());
+//            System.out.println("Parse-State:" + calculator.getContext().toString());
+//            if (calculator.getContext().getCommandStream().length() > 2) {
+//                if (Objects.equals(calculator.getContext().getCommandStream().substring(0, 2), "A@")) {
+//                    System.out.println("Parse-State:" + calculator.getContext().toString());
+//                }
+//            }
         }
-
     }
 
     /**

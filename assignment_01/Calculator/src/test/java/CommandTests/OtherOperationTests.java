@@ -112,7 +112,7 @@ public class OtherOperationTests {
 
     @Test
     public void test_NullCheckOnEmptyString_Returns1() {
-        calculator.push("()");
+        calculator.push(""); // TODO: changed from calculator.push("()")
 
         calculator.executeCommand('_');
 

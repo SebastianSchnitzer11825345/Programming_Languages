@@ -133,7 +133,7 @@ public class Calculator {
         Object a = ctxt.pop();
 
         if(a instanceof String || b instanceof String) {
-            ctxt.push(String.valueOf(a) + b);
+            ctxt.push(String.valueOf(a) + String.valueOf(b));
         }
         else if(a instanceof Double || b instanceof Double) {
             ctxt.push(toDouble(a) + toDouble(b));
@@ -244,7 +244,14 @@ public class Calculator {
         // if second argument is a positive integer, gives ASCII code of the character at index n in the string.
         else if (a instanceof String && b instanceof Integer) {
                 if( (Integer) b >= ((String) a).length() ) {
-                    ctxt.push("()");
+//                    ctxt.push(""); // TODO: change back to before or change everywhere, and exception above
+                    this.getContext().addToCommandStreamInFront("()");
+                    Parser parser = new Parser(this);
+                    try {
+                        parser.parseAll();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                     return;
                 }
                 ctxt.push(Integer.valueOf((int)((String) a).charAt(((Integer) b))));
@@ -279,7 +286,7 @@ public class Calculator {
         Object a = ctxt.pop();
 
         if(a instanceof String) {
-            if(a.equals("()")) {
+            if(a.equals("")) { // TODO: before if(a.equals(""))
                 ctxt.push(1);
             } else ctxt.push(0);
         }
