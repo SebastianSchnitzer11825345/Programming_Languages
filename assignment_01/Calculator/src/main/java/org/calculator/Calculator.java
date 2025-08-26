@@ -145,19 +145,22 @@ public class Calculator {
         Object b = ctxt.pop();
         Object a = ctxt.pop();
 
-        if(a instanceof String && b instanceof Integer) {
-            if((Integer) b < 0 ) {
-                throw new IllegalArgumentException("Subtraction requires a positive number");
-            }
-            ctxt.push(((String) a).substring((Integer) b ));
-
-            return;
-        }
+        // when a (first argument) is an integer, remove num a char from beginning
         if(a instanceof Integer && b instanceof String) {
             if((Integer) a < 0 ) {
                 throw new IllegalArgumentException("Subtraction requires a positive number");
             }
-            ctxt.push(((String) b).substring(0, ((String) b).length()-((Integer) a)));
+            ctxt.push(((String) b).substring((Integer) a ));
+
+            return;
+        }
+
+        // when b (second argument) is an integer, remove num a char from end
+        if(a instanceof String && b instanceof Integer) {
+            if((Integer) b < 0 ) {
+                throw new IllegalArgumentException("Subtraction requires a positive number");
+            }
+            ctxt.push(((String) a).substring(0, ((String) a).length()-((Integer) b)));
             return;
         }
 
@@ -175,6 +178,8 @@ public class Calculator {
         if(a instanceof String && b instanceof String) {
             throw new IllegalArgumentException("Cannot multiply two Strings");
         }
+
+        // when b (second argument) is an integer, add char at end of string
         if(a instanceof String && b instanceof Integer) {
             if((Integer) b < 0  || (Integer) b >= 128 ) {
                 throw new IllegalArgumentException("Multiplication with Integer requires a number between 0 and 128");
@@ -182,6 +187,8 @@ public class Calculator {
             ctxt.push(((String) a) + (char) ((Integer) b).intValue());
             return;
         }
+
+        // when a (first argument) is an integer, add char at start of string
         if(b instanceof String && a instanceof Integer) {
             if((Integer) a < 0  || (Integer) a >= 128 ) {
                 throw new IllegalArgumentException("Multiplication with Integer requires a number between 0 and 128");
@@ -189,6 +196,7 @@ public class Calculator {
             ctxt.push(((char) ((Integer) a).intValue() + (String) b));
             return;
         }
+
         if(a instanceof Double || b instanceof Double) {
             if(a instanceof String || b instanceof String) {
                 throw new IllegalArgumentException("Cannot multiply String with Double");
@@ -232,7 +240,9 @@ public class Calculator {
                 return;
             }
             ctxt.push((Integer)a % (Integer)b);
-        } else if (a instanceof String && b instanceof Integer) {
+        }
+        // if second argument is a positive integer, gives ASCII code of the character at index n in the string.
+        else if (a instanceof String && b instanceof Integer) {
                 if( (Integer) b >= ((String) a).length() ) {
                     ctxt.push("()");
                     return;
