@@ -74,14 +74,22 @@ def eval_expr(expr, env):
     else:
         raise TypeError(f"Unknown expression type: {expr}")
     
+def parse_multiple(tokens):
+    expressions = []
+    while tokens:
+        expressions.append(parse(tokens))
+    return expressions   
 
     
 def run(source, env=None):
     if env is None:
         env = standard_env()
     tokens = tokenize(source)
-    parsed_expr = parse(tokens)
-    return eval_expr(parsed_expr, env)
+    parsed_expr = parse_multiple(tokens)
+    result = None
+    for expr in parsed_expr:
+        result = eval_expr(expr, env)
+    return result
 
 if __name__ == "__main__":
     env = evaluate()
@@ -103,4 +111,3 @@ if __name__ == "__main__":
         except Exception as e:
             print(f"Error: {e}")
 
-#TODO: Make lambda expressions output more useful information when printed
