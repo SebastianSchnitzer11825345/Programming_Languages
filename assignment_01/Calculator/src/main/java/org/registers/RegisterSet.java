@@ -30,8 +30,6 @@ public class RegisterSet implements IReadOnlyRegisters {
         temp.put('t', reg_t_testMode());
         temp.put('x', "+"); // cause it to terminate due to error
 
-        // TODO: these two need to be removed later
-
         // the free small caps
         for (char c = 'f'; c <= 'z'; c++) {
             if (c != 'h' && c != 's' && c != 't' && c != 'x') {
@@ -64,15 +62,12 @@ public class RegisterSet implements IReadOnlyRegisters {
         temp.put('Y', reg_Y_charAscii_two_step());
         temp.put('Z', reg_Z_updateOutputStringFinal());
 
-//        // Populate A–K with increasing numbers of quote characters to print up to 10 elements of data stack
-//        for (char c = 'A'; c <= 'A' + 10; c++) {
-//            temp.put(c, "\"".repeat((c - 'A') + 1));
-//        }
-
-        // G–Z
-//        for (char c = 'M'; c <= 'T'; c++) {
-//            temp.put(c, defaultValue(c));
-//        }
+        // Populate A–K with increasing numbers of quote characters to print up to 10 elements of data stack
+        for (char c = 'M'; c <= 'S'; c++) {
+            if (c != 'O') {
+                temp.put(c, defaultValue(c));
+            }
+        }
     }
 
     private String reg_a_welcome() {

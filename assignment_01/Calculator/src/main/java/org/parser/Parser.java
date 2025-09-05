@@ -35,7 +35,7 @@ public class Parser {
                 break;
             }
 //            // TODO(Alenka): remove when all is working (all tests finished first)
-//            System.out.println("Parse-State:" + calculator.getContext().toString());
+            System.out.println("Parse-State:" + calculator.getContext().toString());
 //            if (calculator.getContext().getCommandStream().length() > 2) {
 //                if (Objects.equals(calculator.getContext().getCommandStream().substring(0, 2), "A@")) {
 //                    System.out.println("Parse-State:" + calculator.getContext().toString());
@@ -103,7 +103,7 @@ public class Parser {
         // used as plain text if neither ’@’ nor \ is applied to it.
         else {
             if (calculator.getContext().isTestMode()) {
-//                System.out.println("Ignored character: " + currChar);
+                System.out.println("Ignored character: " + currChar);
             }
         }
     }
