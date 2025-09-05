@@ -39,7 +39,7 @@ def evaluate():
     'cons': lambda x, lst: [x] + lst if isinstance(lst, list) else [x, lst],
     'list': lambda *args: list(args),
     'nil': [],
-    'true': True,
+    'true': True, 
     'false': False
     }
     return env
@@ -74,27 +74,40 @@ def eval_expr(expr, env):
     else:
         raise TypeError(f"Unknown expression type: {expr}")
     
+def parse_multiple(tokens):
+    expressions = []
+    while tokens:
+        expressions.append(parse(tokens))
+    return expressions   
 
     
 def run(source, env=None):
     if env is None:
         env = standard_env()
     tokens = tokenize(source)
-    parsed_expr = parse(tokens)
-    return eval_expr(parsed_expr, env)
+    parsed_expr = parse_multiple(tokens)
+    result = None
+    for expr in parsed_expr:
+        result = eval_expr(expr, env)
+    return result
 
 if __name__ == "__main__":
     env = evaluate()
+    buffer = []
     while True:
         try:
-            source = input("Input program: ")
-            if source.lower() in ('exit', 'quit'):
+            line = input(">>> " if not buffer else "... ")
+            if line.lower() in ("exit", "quit"):
                 break
-            result = run(source, env)
-            if result is not None:
-                print(result)
+            if line.strip() == "":  # empty line makes the programm execute
+                if buffer:
+                    source = "\n".join(buffer)
+                    result = run(source, env)
+                    if result is not None:
+                        print(result)
+                    buffer = []  # reset buffer
+                continue
+            buffer.append(line)
         except Exception as e:
             print(f"Error: {e}")
 
-#TODO: Make it so multiple lines can be input at once
-#TODO: Make lambda expressions output more useful information when printed
