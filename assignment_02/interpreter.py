@@ -57,7 +57,7 @@ def eval_expr(expr, env):
             _, name, value = expr
             env[name] = eval_expr(value, env)
             return env[name]
-        elif op == 'lambda':
+        elif op == 'lamba':
             _, params, body = expr
             return lambda *args: eval_expr(body, dict(env, **dict(zip(params, args))))
         elif op == 'cond':
@@ -83,7 +83,7 @@ def parse_multiple(tokens):
     
 def run(source, env=None):
     if env is None:
-        env = standard_env()
+        env = evaluate()
     tokens = tokenize(source)
     parsed_expr = parse_multiple(tokens)
     result = None
@@ -96,10 +96,10 @@ if __name__ == "__main__":
     buffer = []
     while True:
         try:
-            line = input(">>> " if not buffer else "... ")
+            line = input(">>> " if not buffer else "... ")           
             if line.lower() in ("exit", "quit"):
                 break
-            if line.strip() == "":  # empty line makes the programm execute
+            if line.strip() == "":  # empty line makes the program execute
                 if buffer:
                     source = "\n".join(buffer)
                     result = run(source, env)
