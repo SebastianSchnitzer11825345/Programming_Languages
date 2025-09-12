@@ -24,14 +24,15 @@ public class RegisterSet implements IReadOnlyRegisters {
         temp.put('c',reg_c_if_then());
         temp.put('d', reg_d_factorial());
         temp.put('e', reg_e_stringAnalyser());
+        temp.put('f', reg_f_stringAnalyser_from_tests());
 
         temp.put('h',reg_h_help());
         temp.put('s', reg_s_callStringAnalyzer());
         temp.put('t', reg_t_testMode());
-        temp.put('x', "+"); // cause it to terminate due to error
+        temp.put('x', ":"); // cause it to terminate due to error
 
         // the free small caps
-        for (char c = 'f'; c <= 'z'; c++) {
+        for (char c = 'g'; c <= 'z'; c++) {
             if (c != 'h' && c != 's' && c != 't' && c != 'x') {
                 temp.put(c, defaultValue(c));
             }
@@ -140,12 +141,29 @@ public class RegisterSet implements IReadOnlyRegisters {
     /**
      * Press e@
      * String to analyse from exercise is "abc+25 a3/X)$"
-     * @return
+     * @return String
      */
     private String reg_e_stringAnalyser() {
         StringBuilder contents = new StringBuilder();
         contents.append("(Enter string to analyse) ");
         contents.append('"');
+        contents.append('\''); //Read input string
+        contents.append("0 "); // starting index
+        contents.append("0 0 0 0 0 "); // Counters for word, letter, digit, space, special characters
+        contents.append("()"); // output string
+        contents.append("()"); // currentWord (for word reversing)
+        contents.append("A@"); // jump to main loop (before f@)
+
+        return contents.toString();
+    }
+
+    /**
+     * Press f@
+     * String to analyse from exercise is "abc+25 a3/X)$"
+     * @return String
+     */
+    private String reg_f_stringAnalyser_from_tests() {
+        StringBuilder contents = new StringBuilder();
         contents.append('\''); //Read input string
         contents.append("0 "); // starting index
         contents.append("0 0 0 0 0 "); // Counters for word, letter, digit, space, special characters
@@ -375,7 +393,7 @@ public class RegisterSet implements IReadOnlyRegisters {
         contents.append("(Spaces: )6!+\" ");
         contents.append("(Special: )5!+\"");
         // clean data stack for further use (9 elements on it)
-        contents.append("1$1$1$1$1$1$1$1$1$1$");
+        contents.append("1$1$1$1$1$1$1$1$?"); // last one just replaced with () so sth stays on stack
 
         return contents.toString();
     }

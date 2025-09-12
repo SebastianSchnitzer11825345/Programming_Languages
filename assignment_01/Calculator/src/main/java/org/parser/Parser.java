@@ -1,8 +1,10 @@
 package org.parser;
 
 import org.calculator.Calculator;
+import org.streams.OutputStream;
 
-import java.util.Objects;
+import java.math.BigDecimal;
+import java.util.EmptyStackException;
 
 /**
  *  Class to help with parsing the language of the calculator.
@@ -18,11 +20,10 @@ public class Parser {
     /**
      *
      * Parse all elements in input (Command stack)
-     * @throws ParseException
      */
-    public void parseAll() throws ParseException {
+    public void parseAll() {
         if (calculator.getContext().getCommandStream().isEmpty()) {
-            throw new ParseException("Empty input");
+            throw new IllegalArgumentException("Empty input");
         }
 
         while (!calculator.getContext().getCommandStream().isEmpty()) {
@@ -30,12 +31,17 @@ public class Parser {
             calculator.getContext().removeExecCharFromCommandStream();
             try {
                 parseElement(currChar);
+            } catch (EmptyStackException e) {
+                calculator.push("ERROR: " + currChar + ". Data stack does not have enough entries");
+                calculator.writeOutput();
+                System.err.println("ERROR: " + currChar + ". Data stack does not have enough entries");
+                break;
             } catch (Exception e) {
                 System.err.println("Error executing command " + currChar + ": " + e.getMessage());
                 break;
             }
 //            // TODO(Alenka): remove when all is working (all tests finished first)
-            System.out.println("Parse-State:" + calculator.getContext().toString());
+//            System.out.println("Parse-State:" + calculator.getContext().toString());
 //            if (calculator.getContext().getCommandStream().length() > 2) {
 //                if (Objects.equals(calculator.getContext().getCommandStream().substring(0, 2), "A@")) {
 //                    System.out.println("Parse-State:" + calculator.getContext().toString());
@@ -46,9 +52,8 @@ public class Parser {
 
     /**
      * Parse individual elements (each character)
-     * @throws ParseException
      */
-    private void parseElement(char currChar) throws ParseException {
+    private void parseElement(char currChar) {
 
         // start with executable operation mode
         if (m == 0) {
@@ -82,6 +87,7 @@ public class Parser {
         // case dot
         else if (currChar == '.') {
             initializeDecimal();
+            m = -2; // enter Decimal Point Construction mode
         }
 
         // case String with "("
@@ -102,8 +108,8 @@ public class Parser {
         // separating two adjacent numbers from each other). A string can be
         // used as plain text if neither ’@’ nor \ is applied to it.
         else {
-            if (calculator.getContext().isTestMode()) {
-                System.out.println("Ignored character: " + currChar);
+            if (currChar == ':') { // using : as exit char in registers
+                System.out.println("Exiting... ");
             }
         }
     }
@@ -123,7 +129,6 @@ public class Parser {
     public void runDecimalPointConstructionMode(char currChar) {
         if (Character.isDigit(currChar)) {
             addToDecimal(currChar); // update value on top of stack
-            m -= 1;
         } else if (currChar == '.') {
             initializeDecimal();
         } else {
@@ -184,15 +189,25 @@ public class Parser {
 
     /**
      * Build Decimal Points in Decimal Points Construction Mode
+     * Using BigDecimal to deal with an issue of floating point precision issues
      * @param currChar
      */
     private void addToDecimal(char currChar) {
-        Object lastToken = calculator.getContext().pop();
-        if (!(lastToken instanceof Double)) {
+        Object currToken = calculator.getContext().pop();
+        BigDecimal value;
+        if (currToken instanceof Double) {
+            value = BigDecimal.valueOf((Double) currToken);
+        } else {
             throw new RuntimeException("Expected Decimal Point on top of stack");
         }
-        Double value = (double) lastToken + Character.getNumericValue(currChar) * Math.pow(10, m + 1);
-        calculator.getContext().push(value); // push new Double value (Decimal Point) on stack
+
+        BigDecimal digit = new BigDecimal(Character.getNumericValue(currChar));
+        int scale = - (m + 1);
+        BigDecimal factor = BigDecimal.TEN.pow(scale);
+        factor = BigDecimal.ONE.divide(factor);
+        digit = digit.multiply(factor);
+        value = value.add(digit);
+        calculator.getContext().push(value.doubleValue()); // push new Double value (Decimal Point) on stack
         m -= 1; // stay in Decimal Place Construction mode, move decimal place
     }
 

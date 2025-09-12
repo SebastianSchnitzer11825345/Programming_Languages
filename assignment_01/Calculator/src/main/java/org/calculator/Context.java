@@ -32,7 +32,6 @@ public class Context {
      * initialization when turning on
      */
     public Context() {
-//        commandStream.append(registers.read('a')); // TODO: move this to .run() in calculator
         this.dataStack = new Stack<>();
         this.inStream = new InStream();
         outStream = new OutputStream();
@@ -42,11 +41,16 @@ public class Context {
      * Sets the calculator into test mode and replaces register a with only "@"
      * @param mode
      */
-    public void setTestMode(boolean mode) {
+    public void setTestModeOld(boolean mode) {
         this.testMode = mode;
         clearCommandStream();
         String startCommand = "@";
         addToCommandStreamInFront(startCommand);
+    }
+
+    public void setTestMode(boolean mode) {
+        this.testMode = mode;
+        clearCommandStream();
     }
 
     public boolean isTestMode() {
@@ -138,11 +142,10 @@ public class Context {
         }
     }
 
-    public Object pop() {
-        if(dataStack.isEmpty()) {
-            throw new EmptyStackException();
-        }
-        return dataStack.pop();
+    public Object pop() throws EmptyStackException {
+        if (dataStack.peek() != null) {
+            return dataStack.pop();
+        } else throw new EmptyStackException();
     }
 
     public Object peek() {
@@ -181,9 +184,6 @@ public class Context {
         state.append(' ' + String.valueOf('\u25B9') + ' ');
         state.append(commandStream.toString());
         return state.toString();
-//
-//        int insertionPoint = result.size();
-//        result.add(insertionPoint, commandStream.toString());
-//        return String.join(" ,", result);
+
     }
 }

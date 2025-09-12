@@ -1,20 +1,8 @@
 package org.calculator;
-import org.parser.ParseException;
 import org.parser.Parser;
 
 import java.util.EmptyStackException;
 import java.util.Objects;
-
-/* TODO:
-    In addition to above cases, an error is reported if the data stack
-    does not have enough entries. If an error occurs, the calculator
-    simply stops its execution and gives an error message.
-     - we need this for example when we are calling " to write output
-       and there is nothing else left on data stack
-    TODO: also need to exit when error occurs during parsing (e.g. entering ':'
-     which is no command)
- */
-
 
 /**
  * Calculator handles operations on state from context
@@ -32,17 +20,10 @@ public class Calculator {
     }
 
     public void push(Object o) {
-        if(o instanceof Integer || o instanceof Double || o instanceof String) {
-            ctxt.push(o);
-        } else {
-            throw new IllegalArgumentException("Object to push does not match expected type");
-        }
+        ctxt.push(o);
     }
 
     public Object pop() {
-        if(ctxt.getDataStack().isEmpty()) {
-            throw new EmptyStackException();
-        }
         return ctxt.pop();
     }
 
@@ -53,9 +34,7 @@ public class Calculator {
         ctxt.reset();
     }
 
-    // TODO: check this section, first element popped is always second (so b) and then a
     public void executeCommand(char command) {
-//        try {
         switch (command) {
             case '+':
                 add();
@@ -119,12 +98,8 @@ public class Calculator {
                 break;
 
             default:
-                throw new UnsupportedOperationException("Unsupported command: " + command);
-//            }
-//        } catch (EmptyStackException | IllegalArgumentException e) {
-//            System.err.println("Error executing command " + command + ": " + e.getMessage());
-//            break;
-//            ctxt.clearCommandStream(); // empty command stream and exit
+                ctxt.addToCommandStreamInFront("()"); // invalid semantics
+//                throw new UnsupportedOperationException("Unsupported command: " + command);
         }
     }
 
@@ -148,26 +123,28 @@ public class Calculator {
         // when a (first argument) is an integer, remove num a char from beginning
         if(a instanceof Integer && b instanceof String) {
             if((Integer) a < 0 ) {
-                throw new IllegalArgumentException("Subtraction requires a positive number");
+                ctxt.addToCommandStreamInFront("()"); // invalid semantics
+//                throw new IllegalArgumentException("Subtraction requires a positive number");
             }
-            ctxt.push(((String) b).substring((Integer) a ));
-
-            return;
+            else {
+                ctxt.push(((String) b).substring((Integer) a )) ;
+            }
         }
 
         // when b (second argument) is an integer, remove num a char from end
-        if(a instanceof String && b instanceof Integer) {
+        else if(a instanceof String && b instanceof Integer) {
             if((Integer) b < 0 ) {
-                throw new IllegalArgumentException("Subtraction requires a positive number");
+                ctxt.addToCommandStreamInFront("()"); // invalid semantics
+//                throw new IllegalArgumentException("Subtraction requires a positive number");
             }
             ctxt.push(((String) a).substring(0, ((String) a).length()-((Integer) b)));
-            return;
         }
 
-        if(a instanceof Double || b instanceof Double) {
-            if(a instanceof String || b instanceof String) throw new IllegalArgumentException("Cannot subtract String and Double");
-
-            ctxt.push(toDouble(a) - toDouble(b));
+        else if(a instanceof Double || b instanceof Double) {
+            if(a instanceof String || b instanceof String) {
+                ctxt.addToCommandStreamInFront("()"); // invalid semantics
+//                throw new IllegalArgumentException("Cannot subtract String and Double");
+            } else ctxt.push(toDouble(a) - toDouble(b));
         }
         else ctxt.push((Integer)a - (Integer)b);
     }
@@ -176,36 +153,33 @@ public class Calculator {
         Object b = ctxt.pop();
         Object a = ctxt.pop();
         if(a instanceof String && b instanceof String) {
-            throw new IllegalArgumentException("Cannot multiply two Strings");
+            ctxt.addToCommandStreamInFront("()"); // invalid semantics
+//            throw new IllegalArgumentException("Cannot multiply two Strings");
         }
 
         // when b (second argument) is an integer, add char at end of string
-        if(a instanceof String && b instanceof Integer) {
-            if((Integer) b < 0  || (Integer) b >= 128 ) {
-                throw new IllegalArgumentException("Multiplication with Integer requires a number between 0 and 128");
-            }
-            ctxt.push(((String) a) + (char) ((Integer) b).intValue());
-            return;
+        else if(a instanceof String && b instanceof Integer) {
+            if((Integer) b < 0  || (Integer) b > 128 ) {
+                ctxt.addToCommandStreamInFront("()"); // invalid semantics
+//                throw new IllegalArgumentException("Multiplication with Integer requires a number between 0 and 128");
+            } else ctxt.push(((String) a) + (char) ((Integer) b).intValue());
         }
 
         // when a (first argument) is an integer, add char at start of string
-        if(b instanceof String && a instanceof Integer) {
+        else if(b instanceof String && a instanceof Integer) {
             if((Integer) a < 0  || (Integer) a >= 128 ) {
-                throw new IllegalArgumentException("Multiplication with Integer requires a number between 0 and 128");
-            }
-            ctxt.push(((char) ((Integer) a).intValue() + (String) b));
-            return;
+                ctxt.addToCommandStreamInFront("()"); // invalid semantics
+//                throw new IllegalArgumentException("Multiplication with Integer requires a number between 0 and 128");
+            } else ctxt.push(((char) ((Integer) a).intValue() + (String) b));
         }
 
-        if(a instanceof Double || b instanceof Double) {
+        else if(a instanceof Double || b instanceof Double) {
             if(a instanceof String || b instanceof String) {
-                throw new IllegalArgumentException("Cannot multiply String with Double");
-
+                ctxt.addToCommandStreamInFront("()"); // invalid semantics
+//                throw new IllegalArgumentException("Cannot multiply String with Double");
             }
-            ctxt.push(toDouble(a) * toDouble(b));
-            return;
-        }
-        ctxt.push((Integer)a * (Integer)b);
+            else ctxt.push(toDouble(a) * toDouble(b));
+        } else ctxt.push((Integer)a * (Integer)b);
     }
 
     private void divide() {
@@ -215,16 +189,22 @@ public class Calculator {
         if(a instanceof String && b instanceof String) {
             String stra = (String)a;
             String strb = (String)b;
-
             ctxt.push(stra.indexOf(strb));
         }
-        else {
+        // both numbers, either Integer or Double
+        else if (a instanceof Number && b instanceof Number) {
             Double da = toDouble(a);
             Double db = toDouble(b);
-            if(db == 0) {
-                throw new IllegalArgumentException("Cannot divide by zero");
+            if(db == 0 | Math.abs(db) < EPSILON) {
+                ctxt.addToCommandStreamInFront("()"); // invalid semantics
+//                throw new IllegalArgumentException("Cannot divide by zero");
             }
-            ctxt.push(da / db);
+            else {
+                ctxt.push(da / db);
+            }
+        }
+        else {
+            ctxt.addToCommandStreamInFront("()"); // invalid semantics
         }
     }
 
@@ -232,50 +212,38 @@ public class Calculator {
         Object b = ctxt.pop();
         Object a = ctxt.pop();
 
-        if(a instanceof Float || b instanceof Float) {
-            ctxt.push("()");
-        } else if(a instanceof Integer && b instanceof Integer) {
+        if(a instanceof Double || b instanceof Double) {
+            ctxt.addToCommandStreamInFront("()"); // invalid semantics
+        }
+        else if(a instanceof Integer && b instanceof Integer) {
             if((Integer) b == 0) {
-                ctxt.push("()");
-                return;
+                ctxt.addToCommandStreamInFront("()"); // invalid semantics
             }
             ctxt.push((Integer)a % (Integer)b);
         }
         // if second argument is a positive integer, gives ASCII code of the character at index n in the string.
         else if (a instanceof String && b instanceof Integer) {
                 if( (Integer) b >= ((String) a).length() ) {
-//                    ctxt.push(""); // TODO: change back to before or change everywhere, and exception above
-                    this.getContext().addToCommandStreamInFront("()");
-                    Parser parser = new Parser(this);
-                    try {
-                        parser.parseAll();
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    return;
+                    ctxt.addToCommandStreamInFront("()"); // invalid semantics
                 }
-                ctxt.push(Integer.valueOf((int)((String) a).charAt(((Integer) b))));
-
-
+                else {
+                    ctxt.push((int) ((String) a).charAt((Integer) b));
+                }
         } else {
-            ctxt.push("()");
+            ctxt.addToCommandStreamInFront("()"); // invalid semantics
         }
-
-
     }
 
     private void negation() {
         Object a = ctxt.pop();
 
         if(a instanceof String) {
-            ctxt.push("()");
-            return;
+            ctxt.addToCommandStreamInFront("()"); // replace top entry with empty string
         }
-        if(a instanceof Double) {
+        else if(a instanceof Double) {
             ctxt.push(-(Double) a);
-            return;
         }
-        ctxt.push(-(Integer) a);
+        else ctxt.push(-(Integer) a);
     }
 
     private void stackSize() {
@@ -286,16 +254,16 @@ public class Calculator {
         Object a = ctxt.pop();
 
         if(a instanceof String) {
-            if(a.equals("")) { // TODO: before if(a.equals(""))
+            if(a.equals("")) {
                 ctxt.push(1);
             } else ctxt.push(0);
         }
-        if(a instanceof Double) {
+        else if(a instanceof Double) {
             if(Math.abs((Double) a) < EPSILON) {
                 ctxt.push(1);
             } else ctxt.push(0);
         }
-        if(a instanceof Integer) {
+        else if(a instanceof Integer) {
             if((Integer) a == 0) ctxt.push(1);
             else ctxt.push(0);
         }
@@ -305,12 +273,8 @@ public class Calculator {
         Object a = ctxt.pop();
 
         if(a instanceof Integer || a instanceof String) {
-            ctxt.push("()");
-        } else {
-
-            ctxt.push(((Double) a).intValue());
-        }
-
+            ctxt.addToCommandStreamInFront("()"); // replace top entry with empty string
+        } else ctxt.push(((Double) a).intValue());
     }
 
     private void comparison(char command) {
@@ -320,10 +284,12 @@ public class Calculator {
         // Case: Both are Strings
         if(a instanceof String && b instanceof String) {
             compareStrings((String) a, (String) b, command);
-            return;
         }
+
+        // TODO: from Aufgabe (should we implement???):
+        //      "We can decide if a value is a number or string by comparing the value with the empty string ()."
         // Case: Only a is a string
-        if(a instanceof String) {
+        else if(a instanceof String) {
             switch(command) {
                 case '=', '<':
                     ctxt.push(0);
@@ -331,12 +297,10 @@ public class Calculator {
                 case '>':
                     ctxt.push(1);
                     break;
-                default: throw new IllegalArgumentException("Invalid comparison command");
             }
-            return;
         }
         // Case: Only b is a string
-        if(b instanceof String) {
+        else if(b instanceof String) {
                 switch(command) {
                     case '=', '>':
                         ctxt.push(0);
@@ -344,22 +308,24 @@ public class Calculator {
                     case '<':
                         ctxt.push(1);
                         break;
-                    default: throw new IllegalArgumentException("Invalid comparison command");
                 }
-                return;
         }
-        // Case a or b are a Float and the other an integer
-        if(a instanceof Double || b instanceof Double) {
+        // Case a or b are a Double and the other an integer
+        else if(a instanceof Double || b instanceof Double) {
             Double da = toDouble(a);
             Double db = toDouble(b);
             boolean withinEpsilon = Math.abs(da) < 1.0 && Math.abs(db) < 1.0;
             switch(command) {
                 case '=':
                     if(withinEpsilon) {
+//                        System.out.println("Found two numbers within [-1,1]");
                         ctxt.push(Math.abs(da - db)<= EPSILON ? 1 : 0);
                     }
                     else {
-                        ctxt.push(Math.abs(da - db) <= Math.max(da, db) * EPSILON ? 1 : 0);
+//                        System.out.println("Found at least one number with abs larger than 1");
+//                        System.out.println("Difference between two number is: " + Math.abs(da - db));
+//                        System.out.println("Epsilon range is: " + Math.abs(Math.max(da, db) * EPSILON));
+                        ctxt.push(Math.abs(da - db) <= Math.abs(Math.max(da, db) * EPSILON) ? 1 : 0);
                     }
                     break;
                 case '<':
@@ -378,8 +344,6 @@ public class Calculator {
                             ctxt.push((da-db<= EPSILON * Math.max(da,db) && db-da > 0) ? 1 : 0);
                         }
                         break;
-
-                default: throw new IllegalArgumentException("Invalid comparison command");
             }
 
         } else {
@@ -395,15 +359,9 @@ public class Calculator {
                     case '>':
                         ctxt.push(ia > ib ? 1 : 0);
                         break;
-                    default: throw new IllegalArgumentException("Invalid comparison command");
                 }
-
         }
-
-
     }
-
-
 
     private void compareStrings(String a, String b, char command) {
         int result = a.compareTo(b);
@@ -417,7 +375,6 @@ public class Calculator {
             case '>':
                 ctxt.push(result > 0 ? 1 : 0);
                 break;
-            default: throw new IllegalArgumentException("Unsupported command: " + command);
         }
     }
 
@@ -449,9 +406,7 @@ public class Calculator {
 
             ctxt.push(ia != 0 && ib != 0 ? 1 : 0);
         }
-        else {
-            ctxt.push("()");
-        }
+        else ctxt.addToCommandStreamInFront("()");
     }
 
 
@@ -465,13 +420,11 @@ public class Calculator {
 
             ctxt.push(ia != 0 || ib != 0 ? 1 : 0);
         }
-        else {
-            ctxt.push("()");
-        }
+        else ctxt.addToCommandStreamInFront("()");
     }
 
     private void delete() {
-        Object a = ctxt.pop(); // pop a either way
+        Object a = ctxt.pop(); // pops a element either way
 
         //"Pops only from the data stack if the top entry is not an integer in the appropriate range."
         if(!(a instanceof Integer)) {
@@ -490,12 +443,12 @@ public class Calculator {
     /**
      * Simple helper function that casts both numeric Objects from the stack to double
      * without needing to typecheck every time
-     *
      */
     private double toDouble(Object o) {
         if (o instanceof Integer) return ((Integer) o).doubleValue();
         if (o instanceof Double) return (Double) o;
-        throw new IllegalArgumentException("Received NaN in toDouble");
+        return 0.0; // default number in case of error, will catch divided by 0 later on
+//        throw new IllegalArgumentException("Received NaN in toDouble");
     }
 
     public int size() {
@@ -533,13 +486,13 @@ public class Calculator {
         ctxt.writeOutput(ctxt.pop());
     }
 
-    public void run() throws ParseException {
+    public void run() {
         this.getContext().loadRegister('a');
         Parser parser = new Parser(this);
         parser.parseAll();
     }
 
-    public void test() throws ParseException {
+    public void test() {
         this.getContext().loadRegister('t');
         Parser parser = new Parser(this);
         parser.parseAll();

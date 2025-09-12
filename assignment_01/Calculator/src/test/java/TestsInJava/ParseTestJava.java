@@ -1,3 +1,5 @@
+package TestsInJava;
+
 import org.calculator.Calculator;
 import org.calculator.Context;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,7 +9,7 @@ import org.parser.Parser;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * this test was used initially, TODO: delete later
+ * this test was used initially,
  */
 public class ParseTestJava {
     private Calculator calculator;
@@ -16,7 +18,7 @@ public class ParseTestJava {
 
     @BeforeEach
     public void setUp() {
-        ctxt.setTestMode(true);
+        ctxt.setTestModeOld(true);
         calculator = new Calculator(ctxt);
         calculator.reset();
         calculator.getContext().clearCommandStream();

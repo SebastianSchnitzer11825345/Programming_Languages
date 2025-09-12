@@ -1,4 +1,4 @@
-package CommandTests;
+package TestsInJava.CommandTests;
 
 import org.calculator.Calculator;
 import org.calculator.Context;
@@ -14,7 +14,7 @@ public class ComparisonOperationTests {
 
     @BeforeEach
     public void setUp() {
-        ctxt.setTestMode(true);
+        ctxt.setTestModeOld(true);
         calculator = new Calculator(ctxt);
         calculator.reset();
     }

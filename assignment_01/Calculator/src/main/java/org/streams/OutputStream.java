@@ -1,9 +1,5 @@
 package org.streams;
 
-// TODO: implement formatting (like Display)
-
-import org.calculator.Calculator;
-
 /**
  * A stream of characters displayed on the screen
  * * If the value is a string, the characters in the string are directly
@@ -22,9 +18,6 @@ public class OutputStream implements IStream {
         throw new UnsupportedOperationException();
     }
 
-    //TODO: and the numbers of words, letters, digits, white-space characters
-    // and special characters in the string (for each category counted separately).
-
     /**
      * Print out data stack object (run mode) or
      * store data stack object in buffer (for Test mode)
@@ -35,7 +28,7 @@ public class OutputStream implements IStream {
         if (testMode) {
             writeOutputToBuffer(o);  // test mode: return StringBuilder
         } else {
-            writeOutputToScreen(o);         // run mode: print to screen
+            writeOutputToScreen(o);  // run mode: print to screen
         }
     }
 
@@ -61,7 +54,7 @@ public class OutputStream implements IStream {
      */
     public String processOutput(Object o) {
         StringBuilder element = new StringBuilder();
-        if (o instanceof Integer || o instanceof String) {
+        if (o instanceof Integer || o instanceof String ) {
             element.append(o);
         } else if (o instanceof Double) {
             double d = (Double) o;
