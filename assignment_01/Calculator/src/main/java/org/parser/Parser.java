@@ -1,7 +1,6 @@
 package org.parser;
 
 import org.calculator.Calculator;
-import org.streams.OutputStream;
 
 import java.math.BigDecimal;
 import java.util.EmptyStackException;
@@ -42,11 +41,6 @@ public class Parser {
             }
 //            // TODO(Alenka): remove when all is working (all tests finished first)
 //            System.out.println("Parse-State:" + calculator.getContext().toString());
-//            if (calculator.getContext().getCommandStream().length() > 2) {
-//                if (Objects.equals(calculator.getContext().getCommandStream().substring(0, 2), "A@")) {
-//                    System.out.println("Parse-State:" + calculator.getContext().toString());
-//                }
-//            }
         }
     }
 
@@ -158,7 +152,7 @@ public class Parser {
 
     /**
      * Build integers in Integer Construction Mode
-     * @param currChar
+     * @param currChar for current character parsed
      */
     private void addToInteger(char currChar) {
         Object lastToken = calculator.getContext().pop();
@@ -190,7 +184,7 @@ public class Parser {
     /**
      * Build Decimal Points in Decimal Points Construction Mode
      * Using BigDecimal to deal with an issue of floating point precision issues
-     * @param currChar
+     * @param currChar for current character parsed
      */
     private void addToDecimal(char currChar) {
         Object currToken = calculator.getContext().pop();
@@ -222,7 +216,7 @@ public class Parser {
 
     /**
      * Build String in String Construction Mode
-     * @param currChar
+     * @param currChar for current character parsed
      */
     private void addToString(char currChar) {
         Object lastToken = calculator.getContext().pop();

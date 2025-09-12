@@ -10,11 +10,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ComparisonOperationTests {
 
     private Calculator calculator;
-    private Context ctxt = new Context();
+    private final Context ctxt = new Context();
 
     @BeforeEach
     public void setUp() {
-        ctxt.setTestModeOld(true);
+        ctxt.setTestMode(true);
         calculator = new Calculator(ctxt);
         calculator.reset();
     }

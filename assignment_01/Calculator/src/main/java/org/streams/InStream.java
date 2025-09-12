@@ -1,7 +1,5 @@
 package org.streams;
 
-import org.calculator.Context;
-
 import java.io.IOException;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -20,19 +18,6 @@ public class InStream implements IStream {
 
     public InStream(InputStreamReader reader) {
         this.reader = new BufferedReader(reader);
-    }
-
-    /**
-     * char by char reading
-     *
-     * @return int
-     */
-    public int read() {
-        try {
-            return reader.read();
-        } catch (IOException e) {
-            return -1;
-        }
     }
 
     /**
@@ -84,19 +69,4 @@ public class InStream implements IStream {
     public String getTestOuput(Boolean testMode) {
         throw new UnsupportedOperationException("Cannot write to input stream");
     }
-
-    /**
-     * Method to test input stream with keyboard
-     * Tested with
-     * café ☕ --> You entered: caf
-     * @param args
-     */
-    public static void main(String[] args){
-        Context ctxt = new Context();
-        ctxt.setInputStream(new InStream());
-        System.out.println("Please type something and press Enter:");
-        Object input = ctxt.readInput();
-        System.out.println("You entered: " + input);
-    }
-
 }

@@ -1,7 +1,5 @@
 package org.streams;
 
-import java.util.Stack;
-
 /**
  * Interface for input/output stream that a program can read from and write to.
  */

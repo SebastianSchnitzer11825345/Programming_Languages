@@ -181,19 +181,20 @@ public class CalculatorTest {
         String result = calculator.getContext().getOutputForTest();
         System.out.println("result is: " + result);
         String expected =
-                    "cba+52 3a/X)$\n" +
-                    "Words: 4\n" +
-                    "Letters: 5\n" +
-                    "Digits: 3\n" +
-                    "Spaces: 1\n" +
-                    "Special: 4";
+                """
+                        cba+52 3a/X)$
+                        Words: 4
+                        Letters: 5
+                        Digits: 3
+                        Spaces: 1
+                        Special: 4""";
         assertEquals(expected, result); // because 3+2 != 5, then 1==1 is true → 1
     }
 
 
     /**
      * Helper function for tests
-     * @param expr
+     * @param expr as String for command line written in language of calculator
      */
     String test(String expr)  {
         // Input is still simulated with InStream

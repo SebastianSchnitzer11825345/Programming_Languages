@@ -163,30 +163,28 @@ public class RegisterSet implements IReadOnlyRegisters {
      * @return String
      */
     private String reg_f_stringAnalyser_from_tests() {
-        StringBuilder contents = new StringBuilder();
-        contents.append('\''); //Read input string
-        contents.append("0 "); // starting index
-        contents.append("0 0 0 0 0 "); // Counters for word, letter, digit, space, special characters
-        contents.append("()"); // output string
-        contents.append("()"); // currentWord (for word reversing)
-        contents.append("A@"); // jump to main loop (before f@)
+        String contents = '\'' + //Read input string
+                "0 " + // starting index
+                "0 0 0 0 0 " + // Counters for word, letter, digit, space, special characters
+                "()" + // output string
+                "()" + // currentWord (for word reversing)
+                "A@"; // jump to main loop (before f@)
 
-        return contents.toString();
+        return contents;
     }
 
     private String reg_h_help() {
-        StringBuilder contents = new StringBuilder();
-        contents.append("(Calculator uses specific syntax: )\"");
-        contents.append("(Options: )\"");
-        contents.append("(i: Enter command using post-notation and syntax rules (e.g. '3 2 +' will output 6))\"");
-        contents.append("( Accepted types: Integer, Decimal Place, String) \"");
-        contents.append("( Allowed operators: =, <, >, +, -, *, /, %, &, |, _, ~, !, $, @, \\, #, \', \" ) \"");
-        contents.append("( String constructions with ( String ) ) \"");
-        contents.append("( Calling functions in registers directly with a-z, A-Z) \"");
-        contents.append("( ) \"");
-        contents.append("(ii: Use string analyzer by entering command 's @' and you will enter the string in next step)");
+        String contents = "(Calculator uses specific syntax: )\"" +
+                "(Options: )\"" +
+                "(i: Enter command using post-notation and syntax rules (e.g. '3 2 +' will output 6))\"" +
+                "( Accepted types: Integer, Decimal Place, String) \"" +
+                "( Allowed operators: =, <, >, +, -, *, /, %, &, |, _, ~, !, $, @, \\, #, \', \" ) \"" +
+                "( String constructions with ( String ) ) \"" +
+                "( Calling functions in registers directly with a-z, A-Z) \"" +
+                "( ) \"" +
+                "(ii: Use string analyzer by entering command 's @' and you will enter the string in next step)";
 
-        return contents.toString();
+        return contents;
     }
 
     private String reg_s_callStringAnalyzer() {

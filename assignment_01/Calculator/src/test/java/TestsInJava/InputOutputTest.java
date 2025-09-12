@@ -17,21 +17,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class InputOutputTest {
     private Calculator calculator;
-    private Context ctxt;
+    private final Context ctxt = new Context();
     private Parser parser;
 
     @BeforeEach
     public void setUp() {
-        this.ctxt = new Context();
         ctxt.setTestModeOld(true); // also sets commands stream to only "@"
         calculator = new Calculator(ctxt);
         this.calculator.reset(); // clear data stack
-//        calculator.push("\'"); // for reading input stream
         this.parser = new Parser(calculator);
     }
 
     @Test
-    void testReadLineFromString() throws Exception {
+    void testReadLineFromString() {
         // Using input As if the user had typed
         InStream input = new InStream("(Hello World)\n");
 
@@ -106,33 +104,32 @@ public class InputOutputTest {
         }
 
         String output = calculator.getContext().getOutputForTest();
-        StringBuilder expectedOutput = new StringBuilder();
-        expectedOutput.append("-3.567");
-        expectedOutput.append("\n");
-        expectedOutput.append("4!4$_1+$@");
-        expectedOutput.append("\n");
-        expectedOutput.append("2.5");
-        expectedOutput.append("\n");
-        expectedOutput.append("8");
-        expectedOutput.append("\n");
-        expectedOutput.append("-3");
+        String expectedOutput = """
+                -3.567\
+                
+                4!4$_1+$@\
+                
+                2.5\
+                
+                8\
+                
+                -3""";
 
-        assertEquals(expectedOutput.toString(), output);
+        assertEquals(expectedOutput, output);
     }
 
     @Test
-    void testOutputStackWithOneElement() throws Exception {
+    void testOutputStackWithOneElement() {
         calculator.getContext().clearCommandStream();
         calculator.push("one");
         calculator.getContext().addToCommandStreamInFront("\"");
-        Parser parser = new Parser(calculator);
         parser.parseAll();
         String output = calculator.getContext().getOutputStream().getTestOuput(true);
         assertEquals("one", output);
     }
 
-//    @Test
-    void testOutputStackWithFiveElements() throws Exception {
+    @Test
+    void testOutputStackWithFiveElements() {
         System.out.println("Starting test testOutputStackWithFiveElements...");
         calculator.getContext().clearCommandStream();
         calculator.push("five");
@@ -141,14 +138,13 @@ public class InputOutputTest {
         calculator.push("two");
         calculator.push("one");
         calculator.getContext().addToCommandStreamInFront("\"\"\"\"\""); // manual version
-        Parser parser = new Parser(calculator);
         parser.parseAll();
         String output = calculator.getContext().getOutputStream().getTestOuput(true);
         assertEquals("one\ntwo\nthree\nfour\nfive", output);
     }
 
 //    @Test
-    void testOutputStackWithFiveElementsLoadRegister() throws Exception {
+    void testOutputStackWithFiveElementsLoadRegister() {
         System.out.println("Start test testOutputStackWithFiveElementsLoadRegister...");
         calculator.getContext().clearCommandStream();
         calculator.push("five");
@@ -166,5 +162,4 @@ public class InputOutputTest {
         System.out.println(calculator.getContext().getOutputForTest());
         assertEquals("one\ntwo\nthree\nfour\nfive", output);
     }
-
 }

@@ -12,12 +12,11 @@ import org.parser.Parser;
  */
 public class ParseTest {
     private Calculator calculator;
-    private Context ctxt;
+    private final Context ctxt = new Context();
     private Parser parser;
 
     @BeforeEach
     public void setUp() {
-        this.ctxt = new Context();
         ctxt.setTestModeOld(true); // also sets commands stream to only "@"
         this.calculator = new Calculator(ctxt);
         this.calculator.reset(); // clear data stack

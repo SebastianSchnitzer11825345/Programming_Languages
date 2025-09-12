@@ -24,8 +24,9 @@ import org.streams.OutputStream;
 public class Context {
     private final RegisterSet registers = new RegisterSet() ;
     private StringBuilder commandStream = new StringBuilder();
-    private Stack<Object> dataStack;
-    private IStream inStream, outStream;
+    private final Stack<Object> dataStack;
+    private IStream inStream;
+    private final IStream outStream;
     private boolean testMode = false;
 
     /**
@@ -39,7 +40,7 @@ public class Context {
 
     /**
      * Sets the calculator into test mode and replaces register a with only "@"
-     * @param mode
+     * @param mode boolean value (true for testing)
      */
     public void setTestModeOld(boolean mode) {
         this.testMode = mode;
@@ -53,15 +54,6 @@ public class Context {
         clearCommandStream();
     }
 
-    public boolean isTestMode() {
-        return testMode;
-    }
-
-    // Input stream
-    public IStream getInputStream() {
-        return inStream;
-    }
-
     public void setInputStream(IStream inStream) {
         this.inStream = inStream;
     }
@@ -73,10 +65,6 @@ public class Context {
     //  Output stream
     public IStream getOutputStream() {
         return outStream;
-    }
-
-    public void setOutputStream(IStream outStream) {
-        this.outStream = outStream;
     }
 
     public void writeOutput(Object o) {
@@ -116,7 +104,7 @@ public class Context {
 
     public void clearCommandStream() {
         if (testMode)
-            commandStream = new StringBuilder("");
+            commandStream = new StringBuilder();
     }
 
     // Registers (since read-only using interface to protect)
@@ -126,12 +114,6 @@ public class Context {
 
     public void loadRegister(char c) {
         commandStream.append(registers.read(c));
-    }
-
-
-    // Data Stack
-    public Stack<Object> getDataStack() {
-        return dataStack;
     }
 
     public void push(Object o) {
@@ -180,10 +162,8 @@ public class Context {
         }
         StringBuilder state = new StringBuilder();
         state.append(String.join(" ,", dataStackState));
-
         state.append(' ' + String.valueOf('\u25B9') + ' ');
         state.append(commandStream.toString());
         return state.toString();
-
     }
 }

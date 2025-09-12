@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class OtherOperationTests {
 
     private Calculator calculator;
-    private Context ctxt = new Context();
+    private final Context ctxt = new Context();
 
     @BeforeEach
     public void setUp() {

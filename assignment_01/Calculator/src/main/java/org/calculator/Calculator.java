@@ -1,14 +1,12 @@
 package org.calculator;
 import org.parser.Parser;
-
-import java.util.EmptyStackException;
 import java.util.Objects;
 
 /**
  * Calculator handles operations on state from context
  */
 public class Calculator {
-    private Context ctxt;
+    private final Context ctxt;
     public static final double EPSILON = 0.00001;
 
     public Calculator(Context ctx) {
@@ -318,13 +316,9 @@ public class Calculator {
             switch(command) {
                 case '=':
                     if(withinEpsilon) {
-//                        System.out.println("Found two numbers within [-1,1]");
                         ctxt.push(Math.abs(da - db)<= EPSILON ? 1 : 0);
                     }
                     else {
-//                        System.out.println("Found at least one number with abs larger than 1");
-//                        System.out.println("Difference between two number is: " + Math.abs(da - db));
-//                        System.out.println("Epsilon range is: " + Math.abs(Math.max(da, db) * EPSILON));
                         ctxt.push(Math.abs(da - db) <= Math.abs(Math.max(da, db) * EPSILON) ? 1 : 0);
                     }
                     break;

@@ -7,11 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.parser.Parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ArithmeticOperationTests {
     private Calculator calculator;
-    private Context ctxt = new Context();
+    private final Context ctxt = new Context();
 
     @BeforeEach
     public void setUp() {
@@ -203,7 +202,7 @@ public class ArithmeticOperationTests {
         assertEquals("", calculator.pop());
     }
 
-    
+
 
     @Test
     public void test_DivideByString_ReturnsCorrectIndex() {

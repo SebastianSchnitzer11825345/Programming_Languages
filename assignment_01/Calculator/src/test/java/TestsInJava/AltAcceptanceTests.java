@@ -10,18 +10,16 @@ import org.parser.Parser;
 public class AltAcceptanceTests {
     private Calculator calculator;
     private Context ctxt;
+    private Parser parser;
 
     @BeforeEach
     public void setUp() {
         this.ctxt = new Context();
         this.ctxt.setTestModeOld(true); // also sets commands stream to only "@"
 
-//        // use for debugging only
-//        System.out.println("Command stream is:" + String.valueOf(this.ctxt.getCommandStream()));
-//        System.out.println("State is:" + this.ctxt.toString());
-
         this.calculator = new Calculator(this.ctxt);
         this.calculator.reset(); // clear data stack
+        this.parser = new Parser(calculator);
     }
 
     @Test
@@ -34,13 +32,7 @@ public class AltAcceptanceTests {
         commandFactorialThree = commandFactorialThree.replace("A", A);
         this.ctxt.push(commandFactorialThree);
 
-        // debugging
-        System.out.println("generated command is: " + commandFactorialThree);
-        System.out.println("State is now:" + this.ctxt.toString());
-
-        Parser parser = new Parser(this.calculator);
         parser.parseAll();
-        System.out.println("State at end is: " + this.ctxt.toString());
         Assertions.assertEquals(6, this.calculator.pop());
     }
 
@@ -49,15 +41,7 @@ public class AltAcceptanceTests {
         this.ctxt.push(1); // add what is on stack at start
         String ifThen = "(8)(9~)(4!4$_1+$@)@";
         this.ctxt.push(ifThen);
-
-        // debugging
-        System.out.println("generated command is: " + ifThen);
-        System.out.println("State is now:" + this.ctxt.toString());
-
-        Parser parser = new Parser(this.calculator);
         parser.parseAll();
-        // debugging
-        System.out.println("State at end is: " + this.ctxt.toString());
 
         Assertions.assertEquals(8, this.calculator.pop());
     }
