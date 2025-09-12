@@ -39,8 +39,6 @@ public class Parser {
                 System.err.println("Error executing command " + currChar + ": " + e.getMessage());
                 break;
             }
-//            // TODO(Alenka): remove when all is working (all tests finished first)
-//            System.out.println("Parse-State:" + calculator.getContext().toString());
         }
     }
 

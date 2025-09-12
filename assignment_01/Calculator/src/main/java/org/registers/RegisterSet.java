@@ -72,24 +72,21 @@ public class RegisterSet implements IReadOnlyRegisters {
     }
 
     private String reg_a_welcome() {
-        StringBuilder contents = new StringBuilder();
-        contents.append("(Welcome to calculator)");
-        contents.append('"');
-        contents.append("(Enter expression and press enter, h@ for help) ");
-        contents.append('"');
-        contents.append('\'');  // READ input from User and  add to data stack
-        contents.append('@');   // EXECute command from top of data stack
-        contents.append('\"');  // command to OUTput top element on data stack
-        contents.append("(Would you like to continue (enter 1) or exit (enter 0) )");
-        contents.append('"');
+        return "(Welcome to calculator)" +
+                '"' +
+                "(Enter expression and press enter, h@ for help) " +
+                '"' +
+                '\'' +  // READ input from User and  add to data stack
+                '@' +   // EXECute command from top of data stack
+                '\"' +  // command to OUTput top element on data stack
+                "(Would you like to continue (enter 1) or exit (enter 0) )" +
+                '"' +
 
-        // start of if-then-else loop
-        contents.append('\''); // READ input from User and  add to data stack
-        contents.append("(b)"); // if true continue by calling b
-        contents.append("(x)"); // else exit
-        contents.append("c@@"); // if-then-condition
-
-        return contents.toString();
+                // start of if-then-else loop
+                '\'' + // READ input from User and  add to data stack
+                "(b)" + // if true continue by calling b
+                "(x)" + // else exit
+                "c@@"; // if-then-condition
     }
 
     /**
@@ -97,22 +94,20 @@ public class RegisterSet implements IReadOnlyRegisters {
      * @return String content of b register
      */
     private String reg_b_loop() {
-        StringBuilder contents = new StringBuilder();
-        contents.append("(Enter expression and press enter) ");
-        contents.append('"');
-        contents.append('\''); // READ input from User and  add to data stack
-        contents.append('@'); // EXECute command from top of data stack
-        contents.append('\"'); // command to OUTput top element on data stack
+        return "(Enter expression and press enter) " +
+                '"' +
+                '\'' + // READ input from User and  add to data stack
+                '@' + // EXECute command from top of data stack
+                '\"' + // command to OUTput top element on data stack
 
-        // start of if-then-else loop
-        contents.append("(Cont (1) |exit (0) )");
-        contents.append('"');
-        // start of if-then-else loop
-        contents.append('\''); // READ input from User and  add to data stack
-        contents.append("(b)"); // if true continue by calling b
-        contents.append("(x)"); // else exit
-        contents.append("c@@"); // execute if-then-condition and option
-        return contents.toString();
+                // start of if-then-else loop
+                "(Cont (1) |exit (0) )" +
+                '"' +
+                // start of if-then-else loop
+                '\'' + // READ input from User and  add to data stack
+                "(b)" + // if true continue by calling b
+                "(x)" + // else exit
+                "c@@"; // execute if-then-condition and option
     }
 
     /**
@@ -121,9 +116,7 @@ public class RegisterSet implements IReadOnlyRegisters {
      * @return String
      */
     private String reg_c_if_then() {
-        StringBuilder contents = new StringBuilder();
-        contents.append("(4!4$_1+$@)@");
-        return contents.toString();
+        return "(4!4$_1+$@)@";
     }
 
     /**
@@ -144,17 +137,14 @@ public class RegisterSet implements IReadOnlyRegisters {
      * @return String
      */
     private String reg_e_stringAnalyser() {
-        StringBuilder contents = new StringBuilder();
-        contents.append("(Enter string to analyse) ");
-        contents.append('"');
-        contents.append('\''); //Read input string
-        contents.append("0 "); // starting index
-        contents.append("0 0 0 0 0 "); // Counters for word, letter, digit, space, special characters
-        contents.append("()"); // output string
-        contents.append("()"); // currentWord (for word reversing)
-        contents.append("A@"); // jump to main loop (before f@)
-
-        return contents.toString();
+        return "(Enter string to analyse) " +
+                '"' +
+                '\'' + //Read input string
+                "0 " + // starting index
+                "0 0 0 0 0 " + // Counters for word, letter, digit, space, special characters
+                "()" + // output string
+                "()" + // currentWord (for word reversing)
+                "A@"; // jump to main loop (before f@)
     }
 
     /**
@@ -163,282 +153,221 @@ public class RegisterSet implements IReadOnlyRegisters {
      * @return String
      */
     private String reg_f_stringAnalyser_from_tests() {
-        String contents = '\'' + //Read input string
+        return '\'' + //Read input string
                 "0 " + // starting index
                 "0 0 0 0 0 " + // Counters for word, letter, digit, space, special characters
                 "()" + // output string
                 "()" + // currentWord (for word reversing)
                 "A@"; // jump to main loop (before f@)
-
-        return contents;
     }
 
     private String reg_h_help() {
-        String contents = "(Calculator uses specific syntax: )\"" +
+        return "(Calculator uses specific syntax: )\"" +
                 "(Options: )\"" +
                 "(i: Enter command using post-notation and syntax rules (e.g. '3 2 +' will output 6))\"" +
                 "( Accepted types: Integer, Decimal Place, String) \"" +
-                "( Allowed operators: =, <, >, +, -, *, /, %, &, |, _, ~, !, $, @, \\, #, \', \" ) \"" +
+                "( Allowed operators: =, <, >, +, -, *, /, %, &, |, _, ~, !, $, @, \\, #, ', \" ) \"" +
                 "( String constructions with ( String ) ) \"" +
                 "( Calling functions in registers directly with a-z, A-Z) \"" +
                 "( ) \"" +
                 "(ii: Use string analyzer by entering command 's @' and you will enter the string in next step)";
-
-        return contents;
     }
 
     private String reg_s_callStringAnalyzer() {
-        StringBuilder contents = new StringBuilder();
-        contents.append("(e)@@");
-        return contents.toString();
+        return "(e)@@";
     }
 
     private String reg_t_testMode() {
-        StringBuilder contents = new StringBuilder();
-        contents.append('\''); // READ input from User and  add to data stack
-        contents.append('@'); // EXECute command from top of data stack
-        return contents.toString();
+        return "'" + // READ input from User and  add to data stack
+                '@'; // EXECute command from top of data stack
     }
 
     private String reg_A_analyse_loop() {
-        StringBuilder contents = new StringBuilder();
-
-        contents.append("W@"); //get char at index from input string
-        contents.append("()="); // check for end of string
-        contents.append("(O)"); // if yes, go to output
-        contents.append("(B)");  // if no, call classifier functions: letter, digit, space, special char
-        contents.append("c@@"); // execute if - then, then execute option
-
-        return contents.toString();
+        return "W@" + //get char at index from input string
+                "()=" + // check for end of string
+                "(O)" + // if yes, go to output
+                "(B)" +  // if no, call classifier functions: letter, digit, space, special char
+                "c@@"; // execute if - then, then execute option
     }
 
     private String reg_B_classify_cap_letter() {
-        StringBuilder contents = new StringBuilder();
         // 65-90 --> check if capital letter (include both 65 and 90)
-        contents.append("W@"); // get Ascii code of letter
-        contents.append("91<"); // include 90
-        contents.append("Y@"); // get Ascii code of letter (2nd step)
-        contents.append("64>"); // include 65
-        contents.append("&"); // both conditions met for capital letter
-        contents.append("(F)"); // if yes, go to letter counter
-        contents.append("(C)"); // if not, continue classifying
-        contents.append("c@@"); // execute if-then + run result
-        return contents.toString();
+        return  "W@" + // get Ascii code of letter
+                "91<" + // include 90
+                "Y@" + // get Ascii code of letter (2nd step)
+                "64>" + // include 65
+                "&" + // both conditions met for capital letter
+                "(F)" + // if yes, go to letter counter
+                "(C)" + // if not, continue classifying
+                "c@@"; // execute if-then + run result
     }
 
     private String reg_C_classify_small_letter() {
-        StringBuilder contents = new StringBuilder();
         // 97-122 --> check if small caps letter (include both 97 and 122)
-        contents.append("W@"); // get Ascii code of letter
-        contents.append("123<"); // include 122
-        contents.append("Y@"); // get Ascii code of letter (2nd step)
-        contents.append("96>"); // include 97
-        contents.append("&"); // both conditions met for small caps letter
-        contents.append("(F)"); // if yes, go to letter counter
-        contents.append("(D)"); // if not, continue classifying
-        contents.append("c@@"); // execute if-then + run result
-        return contents.toString();
+        return "W@" + // get Ascii code of letter
+                "123<" + // include 122
+                "Y@" + // get Ascii code of letter (2nd step)
+                "96>" + // include 97
+                "&" + // both conditions met for small caps letter
+                "(F)" + // if yes, go to letter counter
+                "(D)" + // if not, continue classifying
+                "c@@"; // execute if-then + run result
     }
 
     private String reg_D_classify_digit() {
-        StringBuilder contents = new StringBuilder();
         //48-57 --> Digit
-        contents.append("W@"); // get Ascii code of letter
-        contents.append("47>"); // include 48
-        contents.append("Y@"); // get Ascii code of letter (2nd step)
-        contents.append("58<");
-        contents.append("&"); // both conditions met
-        contents.append("(G)"); // if yes, go to digit counter
-        contents.append("(E)"); // if not, continue classifying
-        contents.append("c@@"); // execute if-then + run result
-        return contents.toString();
+        return "W@" + // get Ascii code of letter
+                "47>" + // include 48
+                "Y@" + // get Ascii code of letter (2nd step)
+                "58<" +
+                "&" + // both conditions met
+                "(G)" + // if yes, go to digit counter
+                "(E)" + // if not, continue classifying
+                "c@@"; // execute if-then + run result
     }
 
     private String reg_E_classify_space() {
-        StringBuilder contents = new StringBuilder();
         // 32 --> Space . check for space
-        contents.append("W@"); // get Ascii code of letter
-        contents.append("32="); // check if space
-        contents.append("(T@ (I) (H) c@)"); // if yes, go to space counter (via T check for word, 0 for word)
-        contents.append("(T@ (K) (J) c@)"); // if no, go to special counter (via T check for word, 0 for word)
-        contents.append("c@@"); // execute if-then + run result
-        return contents.toString();
+        return "W@" + // get Ascii code of letter
+                "32=" + // check if space
+                "(T@ (I) (H) c@)" + // if yes, go to space counter (via T check for word, 0 for word)
+                "(T@ (K) (J) c@)" + // if no, go to special counter (via T check for word, 0 for word)
+                "c@@"; // execute if-then + run result
     }
 
     private String reg_F_letter() {
-        StringBuilder contents = new StringBuilder();
-
         // update current word first, by reversing the characters directly
-        contents.append("W@"); // get ASCII for char at index from input string
-        contents.append("3!*"); // copy currentWord, append char in beginning
-        contents.append("2$"); // replace old current word
-
-        // update and reorder entire stack
-        contents.append("V@"); // index++, delete old entry on stack
-        contents.append("U@"); // rearrange stack: counter words
-        contents.append("V@"); // counter letters++, delete old entry on stack
-        contents.append("U@U@U@U@U@"); // rearrange stack: digit, space, special character, output string, currentWord
-
-        contents.append("A@"); // loop back
-        return contents.toString();
+        return "W@" + // get ASCII for char at index from input string
+                "3!*" + // copy currentWord, append char in beginning
+                "2$" + // replace old current word
+                // update and reorder entire stack
+                "V@" + // index++, delete old entry on stack
+                "U@" + // rearrange stack: counter words
+                "V@" + // counter letters++, delete old entry on stack
+                "U@U@U@U@U@" + // rearrange stack: digit, space, special character, output string, currentWord
+                "A@"; // loop back
     }
 
     private String reg_G_digit() {
-        StringBuilder contents = new StringBuilder();
-
         // update current word first, by reversing the characters directly
-        contents.append("W@"); // get ASCII for char at index from input string
-        contents.append("3!*"); // copy currentWord, append char in beginning
-        contents.append("2$"); // replace old current word
+        return "W@" + // get ASCII for char at index from input string
+                "3!*" + // copy currentWord, append char in beginning
+                "2$" + // replace old current word
 
-        // update and reorder entire stack
-        contents.append("V@"); // index++, delete old entry on stack
-        contents.append("U@U@"); // rearrange stack: counter words, counter letters
-        contents.append("V@"); // counter digits++, delete old entry on stack
-        contents.append("U@U@U@U@"); // rearrange stack: space, special character, output string, currentWord
+                // update and reorder entire stack
+                "V@" + // index++, delete old entry on stack
+                "U@U@" + // rearrange stack: counter words, counter letters
+                "V@" + // counter digits++, delete old entry on stack
+                "U@U@U@U@" + // rearrange stack: space, special character, output string, currentWord
 
-        contents.append("A@"); // loop back
-        return contents.toString();
+                "A@"; // loop back
     }
 
     private String reg_H_space_with_word() {
-        StringBuilder contents = new StringBuilder();
-
         // update current output string first
-        contents.append("X@"); // update Output String and reset current word to ""
+        return "X@" + // update Output String and reset current word to ""
 
-        // update and reorder entire stack
-        contents.append("V@"); // index++, delete old entry on stack
-        contents.append("V@"); // counter words++, delete old entry on stack
-        contents.append("U@U@"); // rearrange stack: counter letters, counter digits
-        contents.append("V@"); // counter space++, delete old entry on stack
-        contents.append("U@U@U@"); // rearrange stack: counter special character, updated output string, new currentWord
+                // update and reorder entire stack
+                "V@" + // index++, delete old entry on stack
+                "V@" + // counter words++, delete old entry on stack
+                "U@U@" + // rearrange stack: counter letters, counter digits
+                "V@" + // counter space++, delete old entry on stack
+                "U@U@U@" + // rearrange stack: counter special character, updated output string, new currentWord
 
-        contents.append("A@"); // loop back
-        return contents.toString();
+                "A@"; // loop back
     }
 
     private String reg_I_space_no_word() {
-        StringBuilder contents = new StringBuilder();
-
         // update current output string first
-        contents.append("W@2$*()"); // get ASCII for char at index from input string, add it to output string
+        return "W@2$*()" + // get ASCII for char at index from input string, add it to output string
 
-        // update and reorder entire stack
-        contents.append("V@"); // index++, delete old entry on stack
-        contents.append("U@U@U@"); // rearrange stack: counter words, letters, digits
-        contents.append("V@"); // counter space++, delete old entry on stack
-        contents.append("U@U@U@"); // rearrange stack: counter special character, updated output string, new currentWord
+                // update and reorder entire stack
+                "V@" + // index++, delete old entry on stack
+                "U@U@U@" + // rearrange stack: counter words, letters, digits
+                "V@" + // counter space++, delete old entry on stack
+                "U@U@U@" + // rearrange stack: counter special character, updated output string, new currentWord
 
-        contents.append("A@"); // loop back
-        return contents.toString();
+                "A@"; // loop back
     }
 
     private String reg_J_special_with_word() {
-        StringBuilder contents = new StringBuilder();
-
         // update current output string first
-        contents.append("X@"); // update Output String and reset current word to ""
+        return "X@" + // update Output String and reset current word to ""
 
-        // update and reorder entire stack
-        contents.append("V@"); // index++, delete old entry on stack
-        contents.append("V@"); // counter words++, delete old entry on stack
-        contents.append("U@U@U@"); // rearrange stack: counter letters, digits, space
-        contents.append("V@"); // counter special character++, delete old entry on stack
-        contents.append("U@U@"); // rearrange stack: updated output string, new currentWord
+                // update and reorder entire stack
+                "V@" + // index++, delete old entry on stack
+                "V@" + // counter words++, delete old entry on stack
+                "U@U@U@" + // rearrange stack: counter letters, digits, space
+                "V@" + // counter special character++, delete old entry on stack
+                "U@U@" + // rearrange stack: updated output string, new currentWord
 
-        contents.append("A@"); // loop back
-        return contents.toString();
+                "A@"; // loop back
     }
 
     private String reg_K_special_no_word() {
-        StringBuilder contents = new StringBuilder();
-
         // update current output string first
-        contents.append("W@2$*()"); // get ASCII for char at index from input string, add it to output string
+        return "W@2$*()" + // get ASCII for char at index from input string, add it to output string
 
-        // update and reorder entire stack
-        contents.append("V@"); // index++, delete old entry on stack
-        contents.append("U@U@U@U@"); // rearrange stack: counter words, letters, digits, space
-        contents.append("V@"); // counter special character++, delete old entry on stack
-        contents.append("U@U@"); // rearrange stack: updated output string, new currentWord
+                // update and reorder entire stack
+                "V@" + // index++, delete old entry on stack
+                "U@U@U@U@" + // rearrange stack: counter words, letters, digits, space
+                "V@" + // counter special character++, delete old entry on stack
+                "U@U@" + // rearrange stack: updated output string, new currentWord
 
-        contents.append("A@"); // loop back
-        return contents.toString();
+                "A@"; // loop back
     }
 
     private String reg_L_CounterUpdate() {
-        StringBuilder contents = new StringBuilder();
-
         // update current output string first
-        contents.append("Z@"); // update Output String and reset current word to ""
+        return "Z@" + // update Output String and reset current word to ""
 
-        // update and reorder entire stack
-        contents.append("U@"); // rearrange stack: index
-        contents.append("V@"); // counter words++, delete old entry on stack
-        contents.append("U@U@U@U@U@U@"); // rearrange stack: counters letters, digits, space, special, updated output string, new currentWord
-
-        return contents.toString();
+                // update and reorder entire stack
+                "U@" + // rearrange stack: index
+                "V@" + // counter words++, delete old entry on stack
+                "U@U@U@U@U@U@"; // rearrange stack: counters letters, digits, space, special, updated output string, new currentWord
     }
 
     private String reg_O_finalOutput() {
-        StringBuilder contents = new StringBuilder();
-        contents.append("T@ () (L@) c@"); // if there is word, go to space counter (via T check for word, 0 for word)
-        contents.append("3!\""); // Output String
-        contents.append("(Words: )9!+\"");
-        contents.append("(Letters: )8!+\" ");
-        contents.append("(Digits: )7!+\" ");
-        contents.append("(Spaces: )6!+\" ");
-        contents.append("(Special: )5!+\"");
-        // clean data stack for further use (9 elements on it)
-        contents.append("1$1$1$1$1$1$1$1$?"); // last one just replaced with () so sth stays on stack
-
-        return contents.toString();
+        return "T@ () (L@) c@" + // if there is word, go to space counter (via T check for word, 0 for word)
+                "3!\"" + // Output String
+                "(Words: )9!+\"" +
+                "(Letters: )8!+\" " +
+                "(Digits: )7!+\" " +
+                "(Spaces: )6!+\" " +
+                "(Special: )5!+\"" +
+                // clean data stack for further use (9 elements on it)
+                "1$1$1$1$1$1$1$1$?"; // last one just replaced with () so sth stays on stack
     }
 
     private String reg_T_checkIfCurrentWord() {
-        StringBuilder contents = new StringBuilder();
-        contents.append("2!");// copy current word
-        contents.append("_");// check if any current word (with _ pops 1 if no word, 0 if word is there
-        return contents.toString();
+        return "2!" +// copy current word
+                "_";// check if any current word (with _ pops 1 if no word, 0 if word is there
     }
     private String reg_U_stackupdate() {
-        StringBuilder contents = new StringBuilder();
-        contents.append("9!9$"); // update stack during letter update
-        return contents.toString();
+        return "9!9$"; // update stack during letter update
     }
 
     private String reg_V_stackincrement() {
-        StringBuilder contents = new StringBuilder();
-        contents.append("9!1+9$"); // update stack and increment value ++
-        return contents.toString();
+        return "9!1+9$"; // update stack and increment value ++
     }
 
     private String reg_W_charAscii() {
-        StringBuilder contents = new StringBuilder();
-        contents.append("10!10!%"); // get string, then index, then capture ASCII integer value of char
-        return contents.toString();
+        return "10!10!%"; // get string, then index, then capture ASCII integer value of char
     }
 
     private String reg_X_updateOutputStringIntermediate() {
-        StringBuilder contents = new StringBuilder();
-        contents.append('+'); // update output string with current word
-        contents.append("()"); // update currentWord
-        contents.append("W@2$*()"); // get ASCII for char at index from input string, add it to output string
-        return contents.toString();
+        return '+' + // update output string with current word
+                "()" + // update currentWord
+                "W@2$*()"; // get ASCII for char at index from input string, add it to output string
     }
 
     private String reg_Y_charAscii_two_step() {
-        StringBuilder contents = new StringBuilder();
-        contents.append("11!11!%"); // get string, then index, then capture ASCII integer value of char
-        return contents.toString();
+        return "11!11!%"; // get string, then index, then capture ASCII integer value of char
     }
 
     private String reg_Z_updateOutputStringFinal() {
-        StringBuilder contents = new StringBuilder();
-        contents.append('+'); // update output string with current word
-        contents.append("()"); // update currentWord
-        return contents.toString();
+        return '+' + // update output string with current word
+                "()"; // update currentWord
     }
 
     private Object defaultValue(char name) {

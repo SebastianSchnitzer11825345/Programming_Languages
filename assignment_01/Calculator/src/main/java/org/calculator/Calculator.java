@@ -284,8 +284,6 @@ public class Calculator {
             compareStrings((String) a, (String) b, command);
         }
 
-        // TODO: from Aufgabe (should we implement???):
-        //      "We can decide if a value is a number or string by comparing the value with the empty string ()."
         // Case: Only a is a string
         else if(a instanceof String) {
             switch(command) {
