@@ -1,4 +1,0 @@
-PROGRAM Loop
-while /= f1 10 DO
-f1 = + f1 1;
-IF == f1 10 THEN f1 = 0
